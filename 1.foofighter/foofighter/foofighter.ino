@@ -46,7 +46,6 @@ void waitForButtonAndCountDown()
   delay(1000);
 }
 
-
 void setup()
 {
  //uncomment if necessary to correct motor directions

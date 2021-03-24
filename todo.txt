@@ -1,6 +1,6 @@
 Funksjoner som må lages/ryddes:
 wait4button
-flip motors
+(flip motors) haster ikke
 initial start
 feilsøking av sensor
 infrarødsensor
@@ -10,6 +10,22 @@ delay->timer
 
 Omskrive koden:
 if statements i void loop -> swtichcase
+
+class ideer:
+Infrarød
+
+class motor:
+	public:
+		funk1
+		funk2
+		sensorvalues()
+		motor()
+	private:
+		var1
+		var2
+		osv
+
+
 
 
 
