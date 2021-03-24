@@ -1,6 +1,9 @@
 #include <Wire.h>
 #include <ZumoShield.h>
 
+// Skrive om til int/const int
+=======================================================================
+
 #define LED 13
 
 // this might need to be tuned for different lighting conditions, surfaces, etc.
@@ -20,8 +23,12 @@ Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 #define NUM_SENSORS 6
 unsigned int sensor_values[NUM_SENSORS];
 
+// lager objekt til sensor i senere bruk
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
+========================================================================
+
+//Funksjon
 void waitForButtonAndCountDown()
 {
   digitalWrite(LED, HIGH);
@@ -39,13 +46,13 @@ void waitForButtonAndCountDown()
   delay(1000);
 }
 
+
 void setup()
 {
  //uncomment if necessary to correct motor directions
   motors.flipLeftMotor(true);
   motors.flipRightMotor(true);
   Serial.begin(9600);
-
   pinMode(LED, HIGH);
 
   waitForButtonAndCountDown();
@@ -53,6 +60,8 @@ void setup()
 
 void loop()
 {
+
+// Iitial start, om til funksjon
   if (button.isPressed())
   {
     // if button is pressed, stop and wait for another press to go again
@@ -61,7 +70,7 @@ void loop()
     waitForButtonAndCountDown();
   }
 
-
+// Feilsøking av sensor, gjøres om til funksjon
   sensors.read(sensor_values);
   Serial.print("Sensor 0 detects: ");
   Serial.println(sensor_values[0]);
@@ -69,6 +78,8 @@ void loop()
   Serial.println(sensor_values[5]);
   Serial.println("");
 
+// Må lager om til Case/funksjoner
+// Erstatte delay med en timer funskjon
   if (sensor_values[0] > QTR_THRESHOLD)
   {
     // if leftmost sensor detects line, reverse and turn to the right
