@@ -32,21 +32,18 @@ void Movement::rev_n_turn_R()
     // start a timer for reverse duration
     revTimer.getTimer(REVERSE_DURATION); 
     bool revTimerStatus = revTimer.timerHasExpired();
+    turnTimer.getTimer(TURN_DURATION + REVERSE_DURATION);
+    bool turnTimerStatus = turnTimer.timerHasExpired();
 
     // reverse while timer is not expired
-    if (revTimerStatus == false)
+    while (revTimerStatus == false)
       {
       motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);   
       }
 
     // if timer has expired, start a new timer
-    else if (revTimerStatus == true)
+    while (revTimerStatus == true && turnTimerStatus == false)
       {
-      turnTimer.getTimer(TURN_DURATION);
-      bool turnTimerStatus = turnTimer.timerHasExpired();
-
-      // While turnTimer has not expired, turn right
-      while (turnTimerStatus == false)
         {
         motors.setSpeeds(TURN_SPEED, -TURN_SPEED); 
         }
