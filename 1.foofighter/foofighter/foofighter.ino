@@ -3,14 +3,19 @@
 #include <Wire.h>
 #include <ZumoShield.h>
 
+<<<<<<< HEAD
 //Local Library
 //-------------------------
 #include "Timer.h"
+#include "Movement.h"
 
 //Named Local Library
 //-------------------------
 Timer Reverse_Timer;
 Timer Turn_Timer;
+Movement mov;
+
+//=======================================================================
 
 const int LED = 13;
 
@@ -25,7 +30,7 @@ const int REVERSE_DURATION = 100; // ms
 const int TURN_DURATION = 200; // ms
 
 ZumoBuzzer buzzer;
-ZumoMotors motors;
+ZumoMotors flip;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 
 const int NUM_SENSORS = 6;
@@ -53,8 +58,8 @@ void waitForButtonAndCountDown()
 void setup()
 {
  //uncomment if necessary to correct motor directions
-  motors.flipLeftMotor(true);
-  motors.flipRightMotor(true);
+  flip.flipLeftMotor(true);
+  flip.flipRightMotor(true);
   Serial.begin(9600);
 
   pinMode(LED, HIGH);
@@ -64,10 +69,15 @@ void setup()
 
 void loop()
 {
+
+  // Initialize speeds, and puts them inside of Movement class
+  mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
+  
+  // Iitial start, ( gjør om til funksjon)
   if (button.isPressed())
   {
     // if button is pressed, stop and wait for another press to go again
-    motors.setSpeeds(0, 0);
+    mov.wait();
     button.waitForRelease();
     waitForButtonAndCountDown();
   }
@@ -83,10 +93,11 @@ void loop()
   if (sensor_values[0] > QTR_THRESHOLD)
   {
     // if leftmost sensor detects line, reverse and turn to the right
+
     Reverse_Timer.getTimer(REVERSE_DURATION);
     if (Reverse_Timer.timerHasExpired() == false)
     {
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+    mov.rev();
     }
     //delay(REVERSE_DURATION);
     else if (Reverse_Timer.timerHasExpired() == true)
@@ -94,21 +105,25 @@ void loop()
     Turn_Timer.getTimer(TURN_DURATION);
     if (Turn_Timer.timerHasExpired() == false)
     {
-    motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
+    mov.turn_R();
     }}
     //delay(TURN_DURATION);
     else
     {
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    mov.forward();
     }
+
+    mov.rev_n_turn_R();
+
   }
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
     // if rightmost sensor detects line, reverse and turn to the left
+
     Reverse_Timer.getTimer(REVERSE_DURATION);
     if (Reverse_Timer.timerHasExpired() == false)
     {
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+    mov.rev();
     }
     //delay(REVERSE_DURATION);
     else if (Reverse_Timer.timerHasExpired() == true)
@@ -116,17 +131,18 @@ void loop()
     Turn_Timer.getTimer(REVERSE_DURATION);
     if (Turn_Timer.timerHasExpired() == false)
     {
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+    mov.turn_L();
     }}
     //delay(TURN_DURATION);
     else
     {
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    mov.forward();
+    mov.rev_n_turn_L();
   }
   }
   else
   {
     // otherwise, go straight
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    mov.forward();
   }
 }
