@@ -83,16 +83,21 @@ void loop()
   if (sensor_values[0] > QTR_THRESHOLD)
   {
     // if leftmost sensor detects line, reverse and turn to the right
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    //delay(REVERSE_DURATION);
     Reverse_Timer.getTimer(REVERSE_DURATION);
-    if (Reverse_Timer.TimerHasExpired() == true)
+    if (Reverse_Timer.timerHasExpired() == false)
+    {
+    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+    }
+    //delay(REVERSE_DURATION);
+    else if (Reverse_Timer.timerHasExpired() == true)
+    {
+    Turn_Timer.getTimer(TURN_DURATION);
+    if (Turn_Timer.timerHasExpired() == false)
     {
     motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
-    }
+    }}
     //delay(TURN_DURATION);
-    Turn_Timer.getTimer(REVERSE_DURATION);
-    if (Turn_Timer.TimerHasExpired() == true)
+    else
     {
     motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
     }
@@ -100,19 +105,24 @@ void loop()
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
     // if rightmost sensor detects line, reverse and turn to the left
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    //delay(REVERSE_DURATION);
     Reverse_Timer.getTimer(REVERSE_DURATION);
-    if (Reverse_Timer.TimerHasExpired() == true)
+    if (Reverse_timer.TimerHasExpired() == false)
+    {
+    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+    }
+    //delay(REVERSE_DURATION);
+    else if (Reverse_timer.TimerHasExpired() == true)
+    {
+    Turn_Timer.getTimer(REVERSE_DURATION);
+    if (Turn_Timer.timerHasExpired() == true)
     {
     motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-    }
+    }}
     //delay(TURN_DURATION);
-    Turn_Timer.getTimer(REVERSE_DURATION);
-    if (Turn_Timer.TimerHasExpired() == true)
+    else
     {
     motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-    }
+  }
   }
   else
   {
