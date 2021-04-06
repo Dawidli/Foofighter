@@ -2,31 +2,31 @@
 #include <ZumoShield.h>
 
 // Skrive om til int/const int
-=======================================================================
+//=======================================================================
 
-#define LED 13
+const int LED = 13;
 
 // this might need to be tuned for different lighting conditions, surfaces, etc.
-#define QTR_THRESHOLD 1500 // microseconds
+// this is the threshhold of when code should take actions, based on sensor input
+const int QTR_THRESHOLD = 1500; // microseconds
 
-// these might need to be tuned for different motor types
-#define REVERSE_SPEED     -400 // 0 is stopped, 400 is full speed
-#define TURN_SPEED        -400
-#define FORWARD_SPEED     -400
-#define REVERSE_DURATION  100 // ms
-#define TURN_DURATION     200 // ms
+// defining speed of different motor actions
+const int REVERSE_SPEED =  -400; // 0 is stopped, 400 is full speed
+const int TURN_SPEED =     -400;
+const int FORWARD_SPEED =  -400;
+const int REVERSE_DURATION= 100; // ms
+const int TURN_DURATION =   200; // ms
 
+const int NUM_SENSORS = 6;
+unsigned int sensor_values[NUM_SENSORS];
+
+// creating objects
 ZumoBuzzer buzzer;
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
-
-#define NUM_SENSORS 6
-unsigned int sensor_values[NUM_SENSORS];
-
-// lager objekt til sensor i senere bruk
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
-========================================================================
+//========================================================================
 
 //Funksjon
 void waitForButtonAndCountDown()
@@ -60,7 +60,7 @@ void setup()
 void loop()
 {
 
-// Iitial start, om til funksjon
+// Iitial start, ( gjør om til funksjon)
   if (button.isPressed())
   {
     // if button is pressed, stop and wait for another press to go again
@@ -70,18 +70,21 @@ void loop()
   }
 
 // Feilsøking av sensor, gjøres om til funksjon
+/*
   sensors.read(sensor_values);
   Serial.print("Sensor 0 detects: ");
   Serial.println(sensor_values[0]);
   Serial.print("Sensor 5 detects: ");
   Serial.println(sensor_values[5]);
   Serial.println("");
+*/
 
-// Må lager om til Case/funksjoner
+// Må lages om til Case/funksjoner
 // Erstatte delay med en timer funskjon
   if (sensor_values[0] > QTR_THRESHOLD)
   {
     // if leftmost sensor detects line, reverse and turn to the right
+    // name suggestion for function (rev_n_turn_R)
     motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
     delay(REVERSE_DURATION);
     motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
@@ -90,6 +93,7 @@ void loop()
   }
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
+    // name suggestion for function (rev_n_turn_L)
     // if rightmost sensor detects line, reverse and turn to the left
     motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
     delay(REVERSE_DURATION);
@@ -100,6 +104,7 @@ void loop()
   else
   {
     // otherwise, go straight
+    // name suggestion for function (drive)
     motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
   }
 }
