@@ -90,59 +90,55 @@ void loop()
   Serial.println(sensor_values[5]);
   Serial.println("");
 */
-  if (sensor_values[0] > QTR_THRESHOLD)
-  {
-    // if leftmost sensor detects line, reverse and turn to the right
 
-    Reverse_Timer.getTimer(REVERSE_DURATION);
-    if (Reverse_Timer.timerHasExpired() == false)
+  if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
     {
-    mov.rev();
+    
+    Reverse_Timer.getTimer(REVERSE_DURATION);            // Start timer with reverse duration
+    bool revTimer = Reverse_Timer.timerHasExpired();
+    
+    if (revTimer == false)                               // If timer has not expired, reverse
+      {
+      mov.rev();
+      }
+    
+    else if (revTimer == true)                           // If reverse timer has expired,
+      {
+      Turn_Timer.getTimer(TURN_DURATION);                // create new timer based on turn duration
+      bool turnTimer = Turn_Timer.timerHasExpired();
+        if (turnTimer == false)                          // and as long as timer has not expired, turn right
+        {
+        mov.turn_R();
+        }
+      }
+    else                                                 // If all timers are expired and left sensors doesn´t detect any lines, drive forward
+      {
+      mov.forward();
+      }
     }
-    //delay(REVERSE_DURATION);
-    else if (Reverse_Timer.timerHasExpired() == true)
-    {
-    Turn_Timer.getTimer(TURN_DURATION);
-    if (Turn_Timer.timerHasExpired() == false)
-    {
-    mov.turn_R();
-    }}
-    //delay(TURN_DURATION);
-    else
-    {
-    mov.forward();
-    }
 
-    mov.rev_n_turn_R();
-
-  }
+                                                          // if rightmost sensor detects line, reverse and turn to the left
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
-    // if rightmost sensor detects line, reverse and turn to the left
-
     Reverse_Timer.getTimer(REVERSE_DURATION);
-    if (Reverse_Timer.timerHasExpired() == false)
-    {
-    mov.rev();
-    }
-    //delay(REVERSE_DURATION);
-    else if (Reverse_Timer.timerHasExpired() == true)
-    {
-    Turn_Timer.getTimer(REVERSE_DURATION);
-    if (Turn_Timer.timerHasExpired() == false)
-    {
-    mov.turn_L();
-    }}
-    //delay(TURN_DURATION);
+    bool revTimer = Reverse_Timer.timerHasExpired();        // Start timer with reverse duration
+    
+    if (revTimer == false)                                  // If timer has not expired, reverse
+      {
+      mov.rev();
+      }
+    else if (revTimer == true)                              // If reverse timer has expired,
+      {
+      Turn_Timer.getTimer(REVERSE_DURATION);                // create new timer based on turn duration
+      bool turnTimer = Turn_Timer.timerHasExpired(); 
+      if (turnTimer == false)                               // and as long as timer has not expired, turn right
+        {
+        mov.turn_L();
+        }
+      }
     else
     {
-    mov.forward();
-    mov.rev_n_turn_L();
-  }
-  }
-  else
-  {
-    // otherwise, go straight
-    mov.forward();
+    mov.forward();                                          // If all timers are expired and right sensors doesn´t detect any lines, drive forward
+    }
   }
 }
