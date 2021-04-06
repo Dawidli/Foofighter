@@ -3,16 +3,18 @@
 #include <Wire.h>
 #include <ZumoShield.h>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4f1de0db320ed813b43b785ca33b1ce29261821e
 //Local Library
 //-------------------------
-#include "Timer.h"
 #include "Movement.h"
 
 //Named Local Library
 //-------------------------
-Timer Reverse_Timer;
-Timer Turn_Timer;
+//Timer Reverse_Timer;
+//Timer Turn_Timer;
 Movement mov;
 
 //=======================================================================
@@ -25,7 +27,11 @@ const int QTR_THRESHOLD = 1500; // microseconds
 // these might need to be tuned for different motor types
 const int REVERSE_SPEED = 400; // 0 is stopped, 400 is full speed
 const int TURN_SPEED = 400;
+<<<<<<< HEAD
 const int FORWARD_SPEED = 100;
+=======
+const int FORWARD_SPEED = 400;
+>>>>>>> 4f1de0db320ed813b43b785ca33b1ce29261821e
 const int REVERSE_DURATION = 100; // ms
 const int TURN_DURATION = 200; // ms
 
@@ -93,7 +99,9 @@ void loop()
 
   if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
     {
-    
+    mov.rev_n_turn_R();
+
+    /*
     Reverse_Timer.getTimer(REVERSE_DURATION);            // Start timer with reverse duration
     bool revTimer = Reverse_Timer.timerHasExpired();
     
@@ -116,11 +124,16 @@ void loop()
       {
       mov.forward();
       }
+    */
     }
+    
 
                                                           // if rightmost sensor detects line, reverse and turn to the left
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
+    mov.rev_n_turn_L();
+
+  /*
     Reverse_Timer.getTimer(REVERSE_DURATION);
     bool revTimer = Reverse_Timer.timerHasExpired();        // Start timer with reverse duration
     
@@ -142,11 +155,21 @@ void loop()
     {
     mov.forward();                                          // If all timers are expired and right sensors doesn´t detect any lines, drive forward
     }
+  */
   }
+<<<<<<< HEAD
   else
     {
     mov.forward();  // If all timers are expired and right sensors doesn´t detect any lines, drive forward
     //Serial.println("forward!");
     }
    
+=======
+
+  
+  else
+    {
+    mov.forward();  
+    }
+>>>>>>> 4f1de0db320ed813b43b785ca33b1ce29261821e
 }
