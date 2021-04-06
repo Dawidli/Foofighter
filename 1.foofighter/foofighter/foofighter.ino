@@ -1,9 +1,9 @@
-// Public Library
+  // Public Library
 //-------------------------
 #include <Wire.h>
 #include <ZumoShield.h>
 
-<<<<<<< HEAD
+
 //Local Library
 //-------------------------
 #include "Timer.h"
@@ -23,9 +23,9 @@ const int LED = 13;
 const int QTR_THRESHOLD = 1500; // microseconds
 
 // these might need to be tuned for different motor types
-const int REVERSE_SPEED = -400; // 0 is stopped, 400 is full speed
-const int TURN_SPEED = -400;
-const int FORWARD_SPEED = -400;
+const int REVERSE_SPEED = 400; // 0 is stopped, 400 is full speed
+const int TURN_SPEED = 400;
+const int FORWARD_SPEED = 100;
 const int REVERSE_DURATION = 100; // ms
 const int TURN_DURATION = 200; // ms
 
@@ -58,8 +58,8 @@ void waitForButtonAndCountDown()
 void setup()
 {
  //uncomment if necessary to correct motor directions
-  flip.flipLeftMotor(true);
-  flip.flipRightMotor(true);
+  flip.flipLeftMotor(false);
+  flip.flipRightMotor(false);
   Serial.begin(9600);
 
   pinMode(LED, HIGH);
@@ -82,14 +82,14 @@ void loop()
     waitForButtonAndCountDown();
   }
 
-/*
+
   sensors.read(sensor_values);
   Serial.print("Sensor 0 detects: ");
   Serial.println(sensor_values[0]);
   Serial.print("Sensor 5 detects: ");
   Serial.println(sensor_values[5]);
   Serial.println("");
-*/
+
 
   if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
     {
@@ -100,6 +100,7 @@ void loop()
     if (revTimer == false)                               // If timer has not expired, reverse
       {
       mov.rev();
+      mov.rev_n_turn_R();   
       }
     
     else if (revTimer == true)                           // If reverse timer has expired,
@@ -126,6 +127,7 @@ void loop()
     if (revTimer == false)                                  // If timer has not expired, reverse
       {
       mov.rev();
+      mov.turn_L();
       }
     else if (revTimer == true)                              // If reverse timer has expired,
       {
@@ -141,4 +143,10 @@ void loop()
     mov.forward();                                          // If all timers are expired and right sensors doesn´t detect any lines, drive forward
     }
   }
+  else
+    {
+    mov.forward();  // If all timers are expired and right sensors doesn´t detect any lines, drive forward
+    //Serial.println("forward!");
+    }
+   
 }
