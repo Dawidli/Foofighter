@@ -1,10 +1,11 @@
+
+
 #include "Timer.h"
 
 Timer::Timer()
 {
   nextTimeout = 0;
 }
-
 
 void Timer::getTimer(int duration)
 {

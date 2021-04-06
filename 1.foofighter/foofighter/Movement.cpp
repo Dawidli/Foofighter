@@ -2,8 +2,11 @@
 #include "Movement.h"
 #include <ZumoShield.h>
 #include <Wire.h>
+#include "Timer.h"
 
 ZumoMotors motors;
+Timer revTimer;
+Timer turnTimer;
 
 Movement::Movement()
   {
@@ -22,23 +25,59 @@ void Movement::initSpeed(int forward, int reverse, int turn, int reverse_dur, in
     REVERSE_DURATION = reverse_dur;
     TURN_DURATION = turn_dur;
   }
-    
+
+   // reverse then turn to the right
 void Movement::rev_n_turn_R()
   {
-    // if leftmost sensor detects line, reverse and turn to the right
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-    motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
-    delay(TURN_DURATION);
+    // start a timer for reverse duration
+    revTimer.getTimer(REVERSE_DURATION); 
+    bool revTimerStatus = revTimer.timerHasExpired();
+
+    // reverse while timer is not expired
+    if (revTimerStatus == false)
+      {
+      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);   
+      }
+
+    // if timer has expired, start a new timer
+    else if (revTimerStatus == true)
+      {
+      turnTimer.getTimer(TURN_DURATION);
+      bool turnTimerStatus = turnTimer.timerHasExpired();
+
+      // While turnTimer has not expired, turn right
+      while (turnTimerStatus == false)
+        {
+        motors.setSpeeds(TURN_SPEED, -TURN_SPEED); 
+        }
+      }
   }
+    
 
 void Movement::rev_n_turn_L()
   {
-    // if rightmost sensor detects line, reverse and turn to the left
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-    delay(TURN_DURATION);
+    // start a timer for reverse duration
+    revTimer.getTimer(REVERSE_DURATION); 
+    bool revTimerStatus = revTimer.timerHasExpired();
+
+    // reverse while timer is not expired
+    if (revTimerStatus == false)
+      {
+      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);   
+      }
+
+    // if timer has expired, start a new timer
+    else if (revTimerStatus == true)
+      {
+      turnTimer.getTimer(TURN_DURATION);
+      bool turnTimerStatus = turnTimer.timerHasExpired();
+
+      // While turnTimer has not expired, turn right
+      while (turnTimerStatus == false)
+        {
+        motors.setSpeeds(-TURN_SPEED, TURN_SPEED); 
+        }
+      }
   }
 
 void Movement::rev()
