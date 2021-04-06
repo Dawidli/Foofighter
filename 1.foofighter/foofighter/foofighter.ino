@@ -106,15 +106,15 @@ void loop()
   {
     // if rightmost sensor detects line, reverse and turn to the left
     Reverse_Timer.getTimer(REVERSE_DURATION);
-    if (Reverse_timer.TimerHasExpired() == false)
+    if (Reverse_Timer.timerHasExpired() == false)
     {
     motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
     }
     //delay(REVERSE_DURATION);
-    else if (Reverse_timer.TimerHasExpired() == true)
+    else if (Reverse_Timer.timerHasExpired() == true)
     {
     Turn_Timer.getTimer(REVERSE_DURATION);
-    if (Turn_Timer.timerHasExpired() == true)
+    if (Turn_Timer.timerHasExpired() == false)
     {
     motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
     }}
