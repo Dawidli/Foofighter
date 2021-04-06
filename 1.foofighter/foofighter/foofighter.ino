@@ -3,10 +3,6 @@
 #include <Wire.h>
 #include <ZumoShield.h>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 4f1de0db320ed813b43b785ca33b1ce29261821e
 //Local Library
 //-------------------------
 #include "Movement.h"
@@ -27,11 +23,9 @@ const int QTR_THRESHOLD = 1500; // microseconds
 // these might need to be tuned for different motor types
 const int REVERSE_SPEED = 400; // 0 is stopped, 400 is full speed
 const int TURN_SPEED = 400;
-<<<<<<< HEAD
 const int FORWARD_SPEED = 100;
-=======
-const int FORWARD_SPEED = 400;
->>>>>>> 4f1de0db320ed813b43b785ca33b1ce29261821e
+
+
 const int REVERSE_DURATION = 100; // ms
 const int TURN_DURATION = 200; // ms
 
@@ -157,19 +151,11 @@ void loop()
     }
   */
   }
-<<<<<<< HEAD
-  else
-    {
-    mov.forward();  // If all timers are expired and right sensors doesn´t detect any lines, drive forward
-    //Serial.println("forward!");
-    }
-   
-=======
 
   
   else
     {
     mov.forward();  
     }
->>>>>>> 4f1de0db320ed813b43b785ca33b1ce29261821e
+
 }
