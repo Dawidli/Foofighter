@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <ZumoShield.h>
+#include "Movement.h"
 
-// Skrive om til int/const int
 //=======================================================================
 
 const int LED = 13;
@@ -22,7 +22,8 @@ unsigned int sensor_values[NUM_SENSORS];
 
 // creating objects
 ZumoBuzzer buzzer;
-ZumoMotors motors;
+Movement mov;
+ZumoMotors flip;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
@@ -49,8 +50,8 @@ void waitForButtonAndCountDown()
 void setup()
 {
  //uncomment if necessary to correct motor directions
-  motors.flipLeftMotor(true);
-  motors.flipRightMotor(true);
+  flip.flipLeftMotor(true);
+  flip.flipRightMotor(true);
   Serial.begin(9600);
   pinMode(LED, HIGH);
 
@@ -59,12 +60,14 @@ void setup()
 
 void loop()
 {
-
-// Iitial start, ( gjør om til funksjon)
+  // Initialize speeds, and puts them inside of Movement class
+  mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
+  
+  // Iitial start, ( gjør om til funksjon)
   if (button.isPressed())
   {
     // if button is pressed, stop and wait for another press to go again
-    motors.setSpeeds(0, 0);
+    mov.wait();
     button.waitForRelease();
     waitForButtonAndCountDown();
   }
@@ -84,27 +87,17 @@ void loop()
   if (sensor_values[0] > QTR_THRESHOLD)
   {
     // if leftmost sensor detects line, reverse and turn to the right
-    // name suggestion for function (rev_n_turn_R)
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-    motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
-    delay(TURN_DURATION);
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    mov.rev_n_turn_R();
   }
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
-    // name suggestion for function (rev_n_turn_L)
     // if rightmost sensor detects line, reverse and turn to the left
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-    delay(TURN_DURATION);
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    mov.rev_n_turn_L();
   }
   else
   {
     // otherwise, go straight
     // name suggestion for function (drive)
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    mov.forward();
   }
 }
