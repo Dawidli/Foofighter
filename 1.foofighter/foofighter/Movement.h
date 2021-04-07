@@ -7,8 +7,8 @@
 class Movement
   {
   public:
-    void rev_n_turn_L();
-    void rev_n_turn_R();
+    void rev_n_turn_L(bool revTimer, bool turnTimer);
+    void rev_n_turn_R(bool revTimer, bool turnTimer);
     void forward();
     void rev();
     void turn_L();

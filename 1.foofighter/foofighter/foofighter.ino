@@ -6,12 +6,14 @@
 //Local Library
 //-------------------------
 #include "Movement.h"
+#include "Timer.h"
 
 //Named Local Library
 //-------------------------
 //Timer Reverse_Timer;
 //Timer Turn_Timer;
 Movement mov;
+Timer timer;
 
 //=======================================================================
 
@@ -21,13 +23,12 @@ const int LED = 13;
 const int QTR_THRESHOLD = 1500; // microseconds
 
 // these might need to be tuned for different motor types
+
 const int REVERSE_SPEED = 400; // 0 is stopped, 400 is full speed
 const int TURN_SPEED = 400;
-const int FORWARD_SPEED = 100;
-
-
-const int REVERSE_DURATION = 100; // ms
-const int TURN_DURATION = 200; // ms
+const int FORWARD_SPEED = 200;
+const int REVERSE_DURATION = 1000; // ms
+const int TURN_DURATION = 2000; // ms
 
 ZumoBuzzer buzzer;
 ZumoMotors flip;
@@ -93,7 +94,12 @@ void loop()
 
   if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
     {
-    mov.rev_n_turn_R();
+    // Start two timers, which control the action inside rev_n_turn_R
+    timer.getTimer(REVERSE_DURATION);
+    bool revTimerStatus = timer.timerHasExpired();
+    timer.getTimer(TURN_DURATION + REVERSE_DURATION);
+    bool turnTimerStatus = timer.timerHasExpired();
+    mov.rev_n_turn_R(revTimerStatus, turnTimerStatus);
 
     /*
     Reverse_Timer.getTimer(REVERSE_DURATION);            // Start timer with reverse duration
@@ -125,7 +131,12 @@ void loop()
                                                           // if rightmost sensor detects line, reverse and turn to the left
   else if (sensor_values[5] > QTR_THRESHOLD)
   {
-    mov.rev_n_turn_L();
+    // Start two timers, which control the action inside rev_n_turn_L
+    timer.getTimer(REVERSE_DURATION);
+    bool revTimerStatus = timer.timerHasExpired();
+    timer.getTimer(TURN_DURATION + REVERSE_DURATION);
+    bool turnTimerStatus = timer.timerHasExpired();
+    mov.rev_n_turn_L(revTimerStatus, turnTimerStatus);
 
   /*
     Reverse_Timer.getTimer(REVERSE_DURATION);

@@ -2,11 +2,8 @@
 #include "Movement.h"
 #include <ZumoShield.h>
 #include <Wire.h>
-#include "Timer.h"
 
 ZumoMotors motors;
-Timer revTimer;
-Timer turnTimer;
 
 Movement::Movement()
   {
@@ -27,54 +24,57 @@ void Movement::initSpeed(int forward, int reverse, int turn, int reverse_dur, in
   }
 
    // reverse then turn to the right
-void Movement::rev_n_turn_R()
+void Movement::rev_n_turn_R(bool revTimer, bool turnTimer)
   {
-    // start a timer for reverse duration
-    revTimer.getTimer(REVERSE_DURATION); 
-    bool revTimerStatus = revTimer.timerHasExpired();
-    turnTimer.getTimer(TURN_DURATION + REVERSE_DURATION);
-    bool turnTimerStatus = turnTimer.timerHasExpired();
+  const int reversing = 0;
+  const int turning = 1;
+  int startCase = reversing;
 
-    // reverse while timer is not expired
-    while (revTimerStatus == false)
-      {
-      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);   
-      }
-
-    // if timer has expired, start a new timer
-    while (revTimerStatus == true && turnTimerStatus == false)
-      {
+  switch (startCase)
+    {
+    case reversing:
+      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+      if (revTimer == true)
         {
-        motors.setSpeeds(TURN_SPEED, -TURN_SPEED); 
+        startCase = turning;
         }
-      }
+          
+      break;
+
+    case turning:
+        motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
+        if (turnTimer == true)
+        {
+          Serial.println("help");
+        }
+      break;
+    } 
   }
     
-
-void Movement::rev_n_turn_L()
+// Reverse then turn to left
+void Movement::rev_n_turn_L(bool revTimer, bool turnTimer)
   {
-    // start a timer for reverse duration
-    revTimer.getTimer(REVERSE_DURATION); 
-    bool revTimerStatus = revTimer.timerHasExpired();
+  const int reversing = 0;
+  const int turning = 1;  
+  int startCase = reversing;
 
-    // reverse while timer is not expired
-    if (revTimerStatus == false)
-      {
-      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);   
-      }
-
-    // if timer has expired, start a new timer
-    else if (revTimerStatus == true)
-      {
-      turnTimer.getTimer(TURN_DURATION);
-      bool turnTimerStatus = turnTimer.timerHasExpired();
-
-      // While turnTimer has not expired, turn right
-      while (turnTimerStatus == false)
+  switch (startCase)
+    {
+    case reversing:
+      while (revTimer == false)
         {
-        motors.setSpeeds(-TURN_SPEED, TURN_SPEED); 
+        motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
         }
-      }
+        startCase = turning;  
+      break;
+
+    case turning:
+        while (turnTimer == false)
+        {
+        motors.setSpeeds(-TURN_SPEED, TURN_SPEED);  
+        }
+      break;
+    } 
   }
 
 void Movement::rev()
