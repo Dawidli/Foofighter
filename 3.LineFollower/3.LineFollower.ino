@@ -1,32 +1,21 @@
-/*
- * Demo line-following code for the Pololu Zumo Robot
- *
- * This code will follow a black line on a white background, using a
- * PID-based algorithm.  It works decently on courses with smooth, 6"
- * radius curves and has been tested with Zumos using 30:1 HP and
- * 75:1 HP motors.  Modifications might be required for it to work
- * well on different courses or with different motors.
- *
- * https://www.pololu.com/catalog/product/2506
- * https://www.pololu.com
- * https://forum.pololu.com
- */
 
 #include <Wire.h>
 #include <ZumoShield.h>
 
-#define LED 13
+// defining variables
+const int LED = 13;
+int lastError = 0;
+const int MAX_SPEED = 400;
 
+//creating objects
 ZumoBuzzer buzzer;
 ZumoReflectanceSensorArray reflectanceSensors;
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON);
-int lastError = 0;
 
-// This is the maximum speed the motors will be allowed to turn.
-// (400 lets the motors go at top speed; decrease to impose a speed limit)
-const int MAX_SPEED = 400;
-
+// function, does action based on button press
+// multiple potensial functions inside of this function
+// might wanna splitt them up
 void waitForButtonAndCountDown()
 {
   digitalWrite(LED, HIGH);
@@ -66,6 +55,12 @@ void setup()
   int i;
   for(i = 0; i < 80; i++)
   {
+    //11-30 or 51-70 -> Left  =(19 - 19)
+    //71-10 or 31-50 -> right =(18 - 19)
+    //but it seems like the counter doesnt loop, so the real values are
+    //11-30 or 51-70 -> Left  =(19 - 19)
+    // 0-10 or 31-50 -> right =(11 - 19)
+    // this makes the robot end up ever so slightly rotatet towards the left side
     if ((i > 10 && i <= 30) || (i > 50 && i <= 70))
       motors.setSpeeds(-100, 100);
     else

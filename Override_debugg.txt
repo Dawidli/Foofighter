@@ -1,0 +1,20 @@
+Start seq
+
+1 Detect line
+2 Search
+3 Attack
+
+while (Detect Line == false)
+	while (Attack == false)
+		while (Search == true)
+			do Attack
+
+if (detect)
+	search=not det
+	attack = not det
+else
+	if (attack)
+		search=not det
+	else
+		search
+
