@@ -11,3 +11,4 @@ Libraries  downloaded for arduino:
 
 ZumoShield
 Servo
+SharpIR
