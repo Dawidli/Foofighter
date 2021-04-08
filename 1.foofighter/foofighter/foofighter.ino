@@ -1,4 +1,4 @@
-// Public Library
+  // Public Library
 //-------------------------
 #include <Wire.h>
 #include <ZumoShield.h>
@@ -10,30 +10,35 @@
 
 //Named Local Library
 //-------------------------
-//Timer Reverse_Timer;
-//Timer Turn_Timer;
 Movement mov;
-Timer timer;
+Timer rev_timer;
+Timer turn_timer;
 
 //=======================================================================
 
 const int LED = 13;
 
+const int l_detect = 1000;
+const int rev = 1001;
+const int turn = 1002;
+int state = l_detect;
+
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 const int QTR_THRESHOLD = 1500; // microseconds
 
 // these might need to be tuned for different motor types
-const int REVERSE_SPEED = 200; // 0 is stopped, 400 is full speed
-const int TURN_SPEED = 200;
+
+const int REVERSE_SPEED = 400; // 0 is stopped, 400 is full speed
+const int TURN_SPEED = 400;
 const int FORWARD_SPEED = 200;
-const int REVERSE_DURATION = 100; // ms
-const int TURN_DURATION = 200; // ms
+const int REVERSE_DURATION = 1000; // ms
+const int TURN_DURATION = 2000; // ms
 
 ZumoBuzzer buzzer;
 ZumoMotors flip;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 
-const int NUM_SENSORS = 6;
+#define NUM_SENSORS 6
 unsigned int sensor_values[NUM_SENSORS];
 
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
@@ -53,6 +58,11 @@ void waitForButtonAndCountDown()
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
   delay(1000);
+}
+
+void changeStateTo (int newState)
+{
+  state = newState;
 }
 
 void setup()
@@ -81,88 +91,60 @@ void loop()
     button.waitForRelease();
     waitForButtonAndCountDown();
   }
-
+  
+  sensors.read(sensor_values); 
 /*
-  sensors.read(sensor_values);
   Serial.print("Sensor 0 detects: ");
   Serial.println(sensor_values[0]);
   Serial.print("Sensor 5 detects: ");
   Serial.println(sensor_values[5]);
   Serial.println("");
 */
-
-  if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
+//Serial.println(state);
+switch(state)
+{
+  case l_detect:
+  //Serial.println("state1");
+    if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
     {
     // Start two timers, which control the action inside rev_n_turn_R
-    timer.getTimer(REVERSE_DURATION);
-    bool revTimerStatus = timer.timerHasExpired();
-    timer.getTimer(TURN_DURATION + REVERSE_DURATION);
-    bool turnTimerStatus = timer.timerHasExpired();
-    mov.rev_n_turn_R(revTimerStatus, turnTimerStatus);
-
-    /*
-    Reverse_Timer.getTimer(REVERSE_DURATION);            // Start timer with reverse duration
-    bool revTimer = Reverse_Timer.timerHasExpired();
-    
-    if (revTimer == false)                               // If timer has not expired, reverse
-      {
-      mov.rev();
-      }
-    
-    else if (revTimer == true)                           // If reverse timer has expired,
-      {
-      Turn_Timer.getTimer(TURN_DURATION);                // create new timer based on turn duration
-      bool turnTimer = Turn_Timer.timerHasExpired();
-        if (turnTimer == false)                          // and as long as timer has not expired, turn right
-        {
-        mov.turn_R();
-        }
-      }
-    else                                                 // If all timers are expired and left sensors doesn´t detect any lines, drive forward
-      {
-      mov.forward();
-      }
-    */
+    rev_timer.getTimer(REVERSE_DURATION);
+    changeStateTo(rev);
     }
-    
+    else if (sensor_values[5] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
+    {
+    // Start two timers, which control the action inside rev_n_turn_R
+    rev_timer.getTimer(REVERSE_DURATION);
+    changeStateTo(rev);
+    }
 
-                                                          // if rightmost sensor detects line, reverse and turn to the left
-  else if (sensor_values[5] > QTR_THRESHOLD)
-  {
-    // Start two timers, which control the action inside rev_n_turn_L
-    timer.getTimer(REVERSE_DURATION);
-    bool revTimerStatus = timer.timerHasExpired();
-    timer.getTimer(TURN_DURATION + REVERSE_DURATION);
-    bool turnTimerStatus = timer.timerHasExpired();
-    mov.rev_n_turn_L(revTimerStatus, turnTimerStatus);
-
-  /*
-    Reverse_Timer.getTimer(REVERSE_DURATION);
-    bool revTimer = Reverse_Timer.timerHasExpired();        // Start timer with reverse duration
-    
-    if (revTimer == false)                                  // If timer has not expired, reverse
-      {
-      mov.rev();
-      }
-    else if (revTimer == true)                              // If reverse timer has expired,
-      {
-      Turn_Timer.getTimer(REVERSE_DURATION);                // create new timer based on turn duration
-      bool turnTimer = Turn_Timer.timerHasExpired(); 
-      if (turnTimer == false)                               // and as long as timer has not expired, turn right
-        {
-        mov.turn_L();
-        }
-      }
     else
     {
-    mov.forward();                                          // If all timers are expired and right sensors doesn´t detect any lines, drive forward
+      mov.forward();
     }
-  */
-  }
 
-  
-  else
+    break;
+    
+  case rev:
+  //Serial.println("state2");
+    mov.rev();
+    if (rev_timer.timerHasExpired())
     {
-    mov.forward();  
+      turn_timer.getTimer(TURN_DURATION);
+      changeStateTo(turn);
     }
+    break;
+
+   case turn:
+   //Serial.println("state3");
+     mov.turn_R();
+     if (turn_timer.timerHasExpired())
+    {
+      changeStateTo(l_detect);
+    }
+    break;
+    
+    
 }
+}
+  

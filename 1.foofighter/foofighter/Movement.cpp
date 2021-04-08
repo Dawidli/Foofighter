@@ -33,17 +33,19 @@ void Movement::rev_n_turn_R(bool revTimer, bool turnTimer)
   switch (startCase)
     {
     case reversing:
-      while (revTimer == false)
+      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+      if (revTimer == true)
         {
-        motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+        startCase = turning;
         }
-        startCase = turning;  
+          
       break;
 
     case turning:
-        while (turnTimer == false)
+        motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
+        if (turnTimer == true)
         {
-        motors.setSpeeds(TURN_SPEED, -TURN_SPEED);  
+          Serial.println("help");
         }
       break;
     } 
