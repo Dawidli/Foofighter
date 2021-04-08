@@ -38,7 +38,7 @@ ZumoBuzzer buzzer;
 ZumoMotors flip;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 
-#define NUM_SENSORS 6
+const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
@@ -101,31 +101,31 @@ void loop()
   Serial.println("");
 */
 //Serial.println(state);
+
 switch(state)
 {
   case l_detect:
   //Serial.println("state1");
-    if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
+    if (sensor_values[0] > QTR_THRESHOLD)                  // if leftmost sensor detects line, start reversing sequence
     {
     // Start two timers, which control the action inside rev_n_turn_R
     rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(rev);
     }
-    else if (sensor_values[5] > QTR_THRESHOLD)                  // if leftmost sensor detects line, reverse and turn to the right
+    else if (sensor_values[5] > QTR_THRESHOLD)                  // if rightmost sensor detects line, start reversing sequence
     {
-    // Start two timers, which control the action inside rev_n_turn_R
     rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(rev);
     }
 
     else
     {
-      mov.forward();
+      mov.forward();                            //if nothing is detected move straight
     }
 
     break;
     
-  case rev:
+  case rev:                                    //if the ground sensor detected something, start reversing
   //Serial.println("state2");
     mov.rev();
     if (rev_timer.timerHasExpired())
@@ -135,7 +135,7 @@ switch(state)
     }
     break;
 
-   case turn:
+   case turn:                                 //when the reversing is done, start turning
    //Serial.println("state3");
      mov.turn_R();
      if (turn_timer.timerHasExpired())
@@ -143,7 +143,6 @@ switch(state)
       changeStateTo(l_detect);
     }
     break;
-    
     
 }
 }

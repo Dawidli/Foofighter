@@ -23,60 +23,6 @@ void Movement::initSpeed(int forward, int reverse, int turn, int reverse_dur, in
     TURN_DURATION = turn_dur;
   }
 
-   // reverse then turn to the right
-void Movement::rev_n_turn_R(bool revTimer, bool turnTimer)
-  {
-  const int reversing = 0;
-  const int turning = 1;
-  int startCase = reversing;
-
-  switch (startCase)
-    {
-    case reversing:
-      motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-      if (revTimer == true)
-        {
-        startCase = turning;
-        }
-          
-      break;
-
-    case turning:
-        motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
-        if (turnTimer == true)
-        {
-          Serial.println("help");
-        }
-      break;
-    } 
-  }
-    
-// Reverse then turn to left
-void Movement::rev_n_turn_L(bool revTimer, bool turnTimer)
-  {
-  const int reversing = 0;
-  const int turning = 1;  
-  int startCase = reversing;
-
-  switch (startCase)
-    {
-    case reversing:
-      while (revTimer == false)
-        {
-        motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-        }
-        startCase = turning;  
-      break;
-
-    case turning:
-        while (turnTimer == false)
-        {
-        motors.setSpeeds(-TURN_SPEED, TURN_SPEED);  
-        }
-      break;
-    } 
-  }
-
 void Movement::rev()
   {
     // set both motors to reverse
