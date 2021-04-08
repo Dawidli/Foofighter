@@ -28,9 +28,12 @@ const int LED = 13;
 const int L_detect = 1000;
 const int rev = 1001;
 const int turn = 1002;
-int state = L_detect;
+int revState = L_detect;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
+
+//Remove this int when IR_SENS get employed
+int IR_SENS = 1;
 
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 const int QTR_THRESHOLD = 1500; // microseconds
@@ -64,7 +67,7 @@ void waitForButtonAndCountDown()
 
 void changeStateTo (int newState)
   {
-  state = newState;
+  revState = newState;
   }
 
 void sensorValues()
@@ -111,42 +114,44 @@ void loop()
   sensors.read(sensor_values); 
   // sensorValues();
 
+//================================================================================
+//Actual actions after initializing
 
-
-
-  switch(state)
+  if((sensor_values[0] > QTR_THRESHOLD) or (sensor_values[5] > QTR_THRESHOLD))
     {
-    case L_detect:
-      if ((sensor_values[0] > QTR_THRESHOLD) or (sensor_values[5] > QTR_THRESHOLD))            // if any of the sensors detects a line, go to rev case and start timer
-        {
-        rev_timer.getTimer(REVERSE_DURATION);
-        changeStateTo(rev);
-        }
-  
-      else
-        {
-        mov.forward();                                  //if nothing is detected move straight
-        }
-  
-    break;
+    rev_timer.getTimer(REVERSE_DURATION);  
+    changeStateTo(rev); 
     
-    case rev:                                           //if the ground sensor detected something, start reversing
-      mov.rev();
-      if (rev_timer.timerHasExpired())
-        {
-        turn_timer.getTimer(TURN_DURATION);
-        changeStateTo(turn);
-        }
-    break;
-
-    case turn:                                          //when the reversing is done, start turning
-      mov.turn_R();
-      if (turn_timer.timerHasExpired())
-        {
-        changeStateTo(L_detect);
-        }
-    break;
+    switch(revState)
+      {
+      case rev:                                           //if the ground sensor detected something, start reversing
+        mov.rev();
+        if (rev_timer.timerHasExpired())
+          {
+          turn_timer.getTimer(TURN_DURATION);
+          changeStateTo(turn);
+          }
+      break;
     
+      case turn:                                          //when the reversing is done, start turning
+        mov.turn_R();
+        if (turn_timer.timerHasExpired())
+          {
+          changeStateTo(L_detect);
+          }
+      break; 
+      }
+    }
+  else
+    {
+    if(IR_SENS == 2)
+      {
+      // attack the enemy vehicle  
+      }
+    else
+      {
+      mov.search();
+      } 
     }
   }
   
