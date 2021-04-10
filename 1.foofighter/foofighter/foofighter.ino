@@ -31,6 +31,7 @@ const int rev_L = 1001;
 const int rev_R = 1002;
 const int turn_L = 1003;
 const int turn_R = 1004;
+
 int revState = placeholder;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
@@ -67,6 +68,7 @@ void waitForButtonAndCountDown()
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
   delay(1000);
+  test_timer.getTimer(TEST_DURATION);
 }
 
 void changeStateTo (int newState)
@@ -92,8 +94,9 @@ void setup()
   flip.flipLeftMotor(false);
   flip.flipRightMotor(false);
   pinMode(LED, HIGH);
-  
+
   waitForButtonAndCountDown();
+ 
 }
 
 
@@ -104,10 +107,10 @@ void loop()
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
   
-  test_timer.getTimer(TEST_DURATION);
+  
   if(test_timer.timerHasExpired())
     {
-    button.isPressed();  
+    mov.wait();  
     }
   // Iitial start, ( gjÃ¸r om til funksjon)
   if (button.isPressed())
