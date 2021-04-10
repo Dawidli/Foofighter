@@ -25,10 +25,12 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 //Constants and Variables
 
 const int LED = 13;
-const int L_detect = 1000;
-const int rev = 1001;
-const int turn = 1002;
-int revState = L_detect;
+const int placeholder = 1000;
+const int rev_L = 1001;
+const int rev_R = 1002;
+const int turn_L = 1003;
+const int turn_R = 1004;
+int revState = placeholder;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
@@ -117,34 +119,53 @@ void loop()
 //================================================================================
 //Actual actions after initializing
 
-  if((sensor_values[0] > QTR_THRESHOLD) or (sensor_values[5] > QTR_THRESHOLD))
+  if(sensor_values[0] > QTR_THRESHOLD)
     {
     rev_timer.getTimer(REVERSE_DURATION);  
-    changeStateTo(rev); 
+    changeStateTo(rev_L); 
     }
-  if(revState == rev or revState == turn)
+  else if(sensor_values[5] > QTR_THRESHOLD) 
+    {
+    rev_timer.getTimer(REVERSE_DURATION);  
+    changeStateTo(rev_R); 
+    }
+  if(revState == rev_L or revState == rev_R)
     {
     switch(revState)
       {
-      case rev:                                           //if the ground sensor detected something, start reversing
+      case rev_L:                                           //if the ground sensor detected something, start reversing
         mov.rev();
         if (rev_timer.timerHasExpired())
           {
           turn_timer.getTimer(TURN_DURATION);
-          changeStateTo(turn);
+          changeStateTo(turn_L);
+          }
+      break;
+
+      case rev_R:                                           //if the ground sensor detected something, start reversing
+        mov.rev();
+        if (rev_timer.timerHasExpired())
+          {
+          turn_timer.getTimer(TURN_DURATION);
+          changeStateTo(turn_R);
           }
       break;
     
-      case turn:                                          //when the reversing is done, start turning
+      case turn_R:                                          //when the reversing is done, start turning
         mov.turn_R();
         if (turn_timer.timerHasExpired())
           {
-          //delay(1000);
-          changeStateTo(L_detect);
-          
+          changeStateTo(placeholder);
           }
-         
-      break; 
+      break;
+
+      case turn_L:                                          //when the reversing is done, start turning
+        mov.turn_L();
+        if (turn_timer.timerHasExpired())
+          {
+          changeStateTo(placeholder);
+          }
+      break;
       }
     }
   else
