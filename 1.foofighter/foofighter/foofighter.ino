@@ -13,6 +13,7 @@
 Movement mov;
 Timer rev_timer;
 Timer turn_timer;
+Timer test_timer;
 
 //Name of Public Library
 //-------------------------
@@ -46,6 +47,7 @@ const int TURN_SPEED = 100;
 const int FORWARD_SPEED = 100;
 const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
+const int TEST_DURATION = 10000; // ms
 
 //========================================================================
 // Functions (might remove later, not sure what class to include them in)
@@ -102,6 +104,11 @@ void loop()
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
   
+  test_timer.getTimer(TEST_DURATION);
+  if(test_timer.timerHasExpired())
+    {
+    button.isPressed();  
+    }
   // Iitial start, ( gjÃ¸r om til funksjon)
   if (button.isPressed())
     {
