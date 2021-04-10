@@ -26,6 +26,7 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 //Constants and Variables
 
 const int LED = 13;
+
 const int placeholder = 1000;
 const int rev_L = 1001;
 const int rev_R = 1002;
@@ -37,15 +38,17 @@ const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
 //Remove this int when IR_SENS get employed
-int IR_SENS = 1;
+const int IR_SENS_PIN = A0;
+const int IRLimit = 200;
+
 
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 const int QTR_THRESHOLD = 1500; // microseconds
 
 // these might need to be tuned for different motor types
-const int REVERSE_SPEED = 100; // 0 is stopped, 400 is full speed
-const int TURN_SPEED = 100;
-const int FORWARD_SPEED = 100;
+const int REVERSE_SPEED = 200; // 0 is stopped, 400 is full speed
+const int TURN_SPEED = 200;
+const int FORWARD_SPEED = 200;
 const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
 const int TEST_DURATION = 10000; // ms
@@ -85,6 +88,20 @@ void sensorValues()
   Serial.println("");  
   }
 
+bool readIR(int pin, int limit)
+{
+  bool IR;
+  int val = analogRead(pin);
+  if (val >= limit)
+  {
+    IR = true;
+  }
+  else
+  {
+    IR = false;
+  }
+  return IR;
+}
 
 //========================================================================
 
@@ -139,7 +156,7 @@ void loop()
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_R); 
     }
-  if(revState == rev_L or revState == rev_R)
+  if(revState == rev_L or revState == rev_R or revState == turn_L or revState == turn_R)
     {
     switch(revState)
       {
@@ -180,9 +197,10 @@ void loop()
     }
   else
     {
-    if(IR_SENS == 2)
+    if(readIR(IR_SENS_PIN, IRLimit))
       {
-      // attack the enemy vehicle  
+      // attack the enemy vehicle
+      mov.forward();  
       }
     else
       {

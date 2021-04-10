@@ -42,12 +42,12 @@ void Movement::wait()
 
 void Movement::turn_L()
   {
-    motors.setSpeeds(TURN_SPEED/2, TURN_SPEED);
+    motors.setSpeeds(TURN_SPEED/4, TURN_SPEED);
   }
 
 void Movement::turn_R()
   {
-    motors.setSpeeds(TURN_SPEED, TURN_SPEED/2);
+    motors.setSpeeds(TURN_SPEED, TURN_SPEED/4);
   }
 
 void Movement::search()
