@@ -2,7 +2,7 @@
 
 const int trigPin = 11;           //connects to the trigger pin on the distance sensor
 const int echoPin = 12;           //connects to the echo pin on the distance sensor
-int distance = 0;
+float distance = 0;
 
 int tall[] = {2,24,9,5,19,21};
 int num_tall = 7;
@@ -28,21 +28,22 @@ void loop() {
   //int loopCounter = 0;
   //int sens_val[6]= {1,1,1,1,1,1}
   
-  int sens_val[num_tall];
+  float sens_val[num_tall];
   
   
     sens_val[loopCounter] = distance;
     loopCounter++;
     loopCounter%=num_tall;
     
-    int total = 0;
+    float total = 0;
     for (int i=0; i<num_tall; i++)
       {
-      total = total + sens_val[loopCounter];  
+      total = total + sens_val[i];  
       }
+    
 
     float testTall = sens_val[0] + sens_val[1] + sens_val[2] + sens_val[3] + sens_val[4] + sens_val[5] + sens_val[6];
-    float avg = testTall/num_tall;
+    float avg = total/num_tall;
 
 
 
