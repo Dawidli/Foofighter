@@ -27,22 +27,20 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
 const int LED = 13;
 
-const int placeholder = 1000;
 const int rev_L = 1001;
 const int rev_R = 1002;
 const int turn_L = 1003;
 const int turn_R = 1004;
 const int forward = 1005;
 const int search = 1006;
+int currentState = forward;
 
-int revState = placeholder;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
 //Remove this int when IR_SENS get employed
 const int IR_SENS_PIN = A0;
 const int IRLimit = 200;
-
 
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 const int QTR_THRESHOLD = 1500; // microseconds
@@ -55,7 +53,7 @@ const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
 const int TEST_DURATION = 10000; // ms
 
-//========================================================================
+//=======================================================================
 // Functions (might remove later, not sure what class to include them in)
 
 void waitForButtonAndCountDown()
@@ -78,7 +76,7 @@ void waitForButtonAndCountDown()
 
 void changeStateTo (int newState)
   {
-  revState = newState;
+  currentState = newState;
   }
 
 void sensorValues()
@@ -113,19 +111,13 @@ void setup()
   flip.flipLeftMotor(false);
   flip.flipRightMotor(false);
   pinMode(LED, HIGH);
-
   waitForButtonAndCountDown();
- 
 }
-
-
 
 void loop()
   {
-
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
-  
   
   if(test_timer.timerHasExpired())
     {
@@ -138,6 +130,7 @@ void loop()
     mov.wait();
     button.waitForRelease();
     waitForButtonAndCountDown();
+    test_timer.getTimer(TEST_DURATION);
     }
 
   // Checking what values sensors are detecting, printing them to Serialmonitor,
@@ -147,31 +140,34 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
-  int currentState = forward;
-  if(readIR(IR_SENS_PIN, IRLimit))
+
+  if(sensor_values[5] > QTR_THRESHOLD) 
     {
-    changeStateTo(forward);
-    }
-  else if(sensor_values[5] > QTR_THRESHOLD) 
-    {
-    rev_timer.getTimer(REVERSE_DURATION);  
+    rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(rev_R);
     }
   else if(sensor_values[0] > QTR_THRESHOLD)
     {
-    rev_timer.getTimer(REVERSE_DURATION);  
+    rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(rev_L); 
     }
   else
     {
-    changeStateTo(search);  
+    if(readIR(IR_SENS_PIN, IRLimit))
+      {
+      changeStateTo(forward);
+      }
+    else
+      {
+      changeStateTo(search);
+      }
     }
 
   switch(currentState)
     {
     case forward:
       mov.forward();
-    break;
+      break;
 
     case rev_L:
       mov.rev();
@@ -180,7 +176,7 @@ void loop()
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(turn_L); 
         }
-    break;
+      break;
 
     case rev_R:
       mov.rev();
@@ -189,7 +185,7 @@ void loop()
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(turn_R);  
         }
-    break;
+      break;
 
     case turn_R:
       mov.turn_R();
@@ -197,7 +193,7 @@ void loop()
         {
         changeStateTo(search);  
         }
-    break;
+      break;
 
     case turn_L:
       mov.turn_L();
@@ -205,6 +201,11 @@ void loop()
         {
         changeStateTo(search);  
         }
+      break;
+
+    case search:
+      mov.search();
+      break;
     }
     
   
