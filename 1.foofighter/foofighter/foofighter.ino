@@ -34,8 +34,9 @@ const int turn_L = 1003;
 const int turn_R = 1004;
 const int forward = 1005;
 const int search = 1006;
+ int currentState = search;
 
-int revState = placeholder;
+//int revState = placeholder;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
@@ -78,7 +79,7 @@ void waitForButtonAndCountDown()
 
 void changeStateTo (int newState)
   {
-  revState = newState;
+  currentState = newState;
   }
 
 void sensorValues()
@@ -122,11 +123,13 @@ void setup()
 
 void loop()
   {
+    mov.forward();
+    Serial.println("hei gulle");
 
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
   
-  
+ 
   if(test_timer.timerHasExpired())
     {
     mov.wait();  
@@ -147,12 +150,9 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
-  int currentState = forward;
-  if(readIR(IR_SENS_PIN, IRLimit))
-    {
-    changeStateTo(forward);
-    }
-  else if(sensor_values[5] > QTR_THRESHOLD) 
+  /*
+  
+  if(sensor_values[5] > QTR_THRESHOLD) 
     {
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_R);
@@ -163,9 +163,16 @@ void loop()
     changeStateTo(rev_L); 
     }
   else
+  {
+  if(readIR(IR_SENS_PIN, IRLimit))
+    {
+    changeStateTo(forward);
+    }  
+  
+  else
     {
     changeStateTo(search);  
-    }
+    }}
 
   switch(currentState)
     {
@@ -205,10 +212,16 @@ void loop()
         {
         changeStateTo(search);  
         }
+        break;
+
+     case search:
+     mov.wait();
+     break;
     }
+    Serial.println(currentState);
     
   
-  
+  */
 //RECONSTRUCTION ABOVE ==========================================================
 /*  
   if(sensor_values[0] > QTR_THRESHOLD)
