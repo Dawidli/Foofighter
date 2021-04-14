@@ -32,6 +32,8 @@ const int rev_L = 1001;
 const int rev_R = 1002;
 const int turn_L = 1003;
 const int turn_R = 1004;
+const int forward = 1005;
+const int search = 1006;
 
 int revState = placeholder;
 const int NUM_SENSORS = 6;
@@ -145,7 +147,70 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
+  int currentState = forward;
+  if(readIR(IR_SENS_PIN, IRLimit))
+    {
+    changeStateTo(forward);
+    }
+  else if(sensor_values[5] > QTR_THRESHOLD) 
+    {
+    rev_timer.getTimer(REVERSE_DURATION);  
+    changeStateTo(rev_R);
+    }
+  else if(sensor_values[0] > QTR_THRESHOLD)
+    {
+    rev_timer.getTimer(REVERSE_DURATION);  
+    changeStateTo(rev_L); 
+    }
+  else
+    {
+    changeStateTo(search);  
+    }
 
+  switch(currentState)
+    {
+    case forward:
+      mov.forward();
+    break;
+
+    case rev_L:
+      mov.rev();
+      if(rev_timer.timerHasExpired())
+        {
+        turn_timer.getTimer(TURN_DURATION);
+        changeStateTo(turn_L); 
+        }
+    break;
+
+    case rev_R:
+      mov.rev();
+      if(rev_timer.timerHasExpired())
+        {
+        turn_timer.getTimer(TURN_DURATION);
+        changeStateTo(turn_R);  
+        }
+    break;
+
+    case turn_R:
+      mov.turn_R();
+      if(turn_timer.timerHasExpired())
+        {
+        changeStateTo(search);  
+        }
+    break;
+
+    case turn_L:
+      mov.turn_L();
+      if(turn_timer.timerHasExpired())
+        {
+        changeStateTo(search);  
+        }
+    }
+    
+  
+  
+//RECONSTRUCTION ABOVE ==========================================================
+/*  
   if(sensor_values[0] > QTR_THRESHOLD)
     {
     rev_timer.getTimer(REVERSE_DURATION);  
@@ -207,5 +272,6 @@ void loop()
       mov.search();
       } 
     }
-  }
+*/
+}
   
