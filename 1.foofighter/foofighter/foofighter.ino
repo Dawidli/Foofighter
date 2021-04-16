@@ -42,8 +42,10 @@ int currentState = search;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
+const int IR_Left = 6;
+const int IR_Right = 11;
 const int IR_SENS_PIN = A0;
-const int IRLimit = 200;
+const int IRLimit = 180;
 
 // the treshold for the floor sensors
 // this might need to be tuned for different lighting conditions, surfaces, etc.
@@ -57,6 +59,7 @@ const int FORWARD_SPEED = 200;
 const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
 const int TEST_DURATION = 10000; // ms
+
 
 
 
@@ -104,6 +107,8 @@ void setup()
   flip.flipLeftMotor(true);
   flip.flipRightMotor(false);
   pinMode(LED, HIGH);
+  pinMode(IR_Left, OUTPUT);
+  pinMode(IR_Right, OUTPUT);
 
   waitForButtonAndCountDown();
  
@@ -136,8 +141,15 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
-  int ir = IR_R.readIR(IR_SENS_PIN, IRLimit); // Infra red sensor reading
 
+  int ir = IR_R.readIR(IR_SENS_PIN, IRLimit); // Infra red sensor reading
+  digitalWrite(IR_Left, HIGH);
+  digitalWrite(IR_Right, HIGH);
+
+  float penis = analogRead(IR_Left);
+  Serial.println(ir);
+  
+//Serial.println(ir);
 //================================================================================
 // movement controll
   if(sensor_values[5] > QTR_THRESHOLD) 
