@@ -7,10 +7,12 @@
 //-------------------------
 #include "Movement.h"
 #include "Timer.h"
+#include "Sens.h"
 
 //Named Local Library
 //-------------------------
 Movement mov;
+Sens IR_R;
 Timer rev_timer;
 Timer turn_timer;
 Timer test_timer;
@@ -34,11 +36,9 @@ const int turn_L = 1003;
 const int turn_R = 1004;
 const int forward = 1005;
 const int search = 1006;
-
-
 int currentState = search;
 
-//int revState = placeholder;
+
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
@@ -136,8 +136,10 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
-  int ir = readIR(IR_SENS_PIN, IRLimit);
-  
+  int ir = IR_R.readIR(IR_SENS_PIN, IRLimit); // Infra red sensor reading
+
+//================================================================================
+// movement controll
   if(sensor_values[5] > QTR_THRESHOLD) 
     {
     rev_timer.getTimer(REVERSE_DURATION);  
@@ -157,9 +159,9 @@ void loop()
     {
     changeStateTo(search);  
     }
-
-    Serial.println(ir);
-  
+//================================================================================
+// motor controll
+   
   switch(currentState)
     {
     case forward:
@@ -202,7 +204,7 @@ void loop()
         }
         break;
 
-     case search:der
+     case search:
      mov.wait();
      break;
     }}

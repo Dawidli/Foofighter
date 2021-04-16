@@ -1,10 +1,15 @@
+#include "Sens.h"
 
+Sens::Sens()
+{
+  val = 0;
+}
 
-
-bool readIR(int pin, int limit)
+bool Sens::readIR(int pin, int limit)
 {
   bool IR;
-  int val = analogRead(pin);
+  val = analogRead(pin);
+  
   if (val >= limit)
   {
     IR = true;
