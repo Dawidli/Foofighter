@@ -27,7 +27,7 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
 const int LED = 13;
 
-const int placeholder = 1000;
+// Contstans to the Case-system
 const int rev_L = 1001;
 const int rev_R = 1002;
 const int turn_L = 1003;
@@ -35,21 +35,21 @@ const int turn_R = 1004;
 const int forward = 1005;
 const int search = 1006;
 
-bool holdState = true; // et forøsk på å holda ryggingå
- int currentState = search;
+
+int currentState = search;
 
 //int revState = placeholder;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
-//Remove this int when IR_SENS get employed
 const int IR_SENS_PIN = A0;
 const int IRLimit = 200;
 
-
+// the treshold for the floor sensors
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 const int QTR_THRESHOLD = 1500; // microseconds
 
+//motor speed
 // these might need to be tuned for different motor types
 const int REVERSE_SPEED = 200; // 0 is stopped, 400 is full speed
 const int TURN_SPEED = 200;
@@ -58,8 +58,10 @@ const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
 const int TEST_DURATION = 10000; // ms
 
+
+
 //========================================================================
-// Functions (might remove later, not sure what class to include them in)
+// functions
 
 void waitForButtonAndCountDown()
 {
@@ -76,7 +78,7 @@ void waitForButtonAndCountDown()
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
   delay(1000);
-  test_timer.getTimer(TEST_DURATION);
+  //test_timer.getTimer(TEST_DURATION);
 }
 
 void changeStateTo (int newState)
@@ -93,21 +95,6 @@ void sensorValues()
   Serial.println("");  
   }
 
-bool readIR(int pin, int limit)
-{
-  bool IR;
-  int val = analogRead(pin);
-  Serial.println(val);
-  if (val >= limit)
-  {
-    IR = true;
-  }
-  else
-  {
-    IR = false;
-  }
-  return IR;
-}
 
 //========================================================================
 
@@ -129,13 +116,11 @@ void loop()
    
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
-  
- 
+  /*
   if(test_timer.timerHasExpired())
     {
     mov.wait();  
-    }
-  // Iitial start, ( gjÃ¸r om til funksjon)
+    }*/
   if (button.isPressed())
     {
     // if button is pressed, stop and wait for another press to go again
@@ -151,33 +136,29 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
-  
+  int ir = readIR(IR_SENS_PIN, IRLimit);
   
   if(sensor_values[5] > QTR_THRESHOLD) 
     {
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_R);
-    holdState = false;
     }
   else if(sensor_values[0] > QTR_THRESHOLD)
     {
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_L); 
-    holdState = false;
     }
-  else
-  {
-  while (holdState == true)
-  {
   
-  if(readIR(IR_SENS_PIN, IRLimit))
-    {
+  else if (currentState > 1002 and ir)
+  {
     changeStateTo(forward);
     }  
-  else
+  else if (currentState > 1004 and !ir)
     {
     changeStateTo(search);  
-    }}}
+    }
+
+    Serial.println(ir);
   
   switch(currentState)
     {
@@ -190,7 +171,7 @@ void loop()
       if(rev_timer.timerHasExpired())
         {
         turn_timer.getTimer(TURN_DURATION);
-        changeStateTo(turn_L); 
+        changeStateTo(turn_R); 
         }
     break;
 
@@ -199,7 +180,7 @@ void loop()
       if(rev_timer.timerHasExpired())
         {
         turn_timer.getTimer(TURN_DURATION);
-        changeStateTo(turn_R);  
+        changeStateTo(turn_L);  
         }
     break;
 
@@ -208,7 +189,7 @@ void loop()
       if(turn_timer.timerHasExpired())
         {
         changeStateTo(search);
-        holdState = true;  
+          
         }
     break;
 
@@ -217,81 +198,11 @@ void loop()
       if(turn_timer.timerHasExpired())
         {
         changeStateTo(search);  
-        holdState = true;
+        
         }
         break;
 
-     case search:
+     case search:der
      mov.wait();
      break;
     }}
-    
-    
-  
-  
-//RECONSTRUCTION ABOVE ==========================================================
- /*
-  if(sensor_values[0] > QTR_THRESHOLD)
-    {
-    rev_timer.getTimer(REVERSE_DURATION);  
-    changeStateTo(rev_L); 
-    }
-  else if(sensor_values[5] > QTR_THRESHOLD) 
-    {
-    rev_timer.getTimer(REVERSE_DURATION);  
-    changeStateTo(rev_R); 
-    }
-  if(currentState == (rev_L or rev_R or turn_L or turn_R))
-    {
-    switch(currentState)
-      {
-      case rev_L:                                           //if the ground sensor detected something, start reversing
-        mov.rev();
-        if (rev_timer.timerHasExpired())
-          {
-          turn_timer.getTimer(TURN_DURATION);
-          changeStateTo(turn_L);
-          }
-      break;
-
-      case rev_R:                                           //if the ground sensor detected something, start reversing
-        mov.rev();
-        if (rev_timer.timerHasExpired())
-          {
-          turn_timer.getTimer(TURN_DURATION);
-          changeStateTo(turn_R);
-          }
-      break;
-    
-      case turn_R:                                          //when the reversing is done, start turning
-        mov.turn_R();
-        if (turn_timer.timerHasExpired())
-          {
-          changeStateTo(placeholder);
-          }
-      break;
-
-      case turn_L:                                          //when the reversing is done, start turning
-        mov.turn_L();
-        if (turn_timer.timerHasExpired())
-          {
-          changeStateTo(placeholder);
-          }
-      break;
-      }
-    }
-  else
-    {
-    if(readIR(IR_SENS_PIN, IRLimit))
-      {
-      // attack the enemy vehicle
-      mov.forward();  
-      }
-    else
-      {
-      mov.search();
-      } 
-    }
-sensorValues();
-}
- */
