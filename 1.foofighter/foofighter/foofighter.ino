@@ -29,13 +29,14 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
 const int LED = 13;
 
-// Contstans to the Case-system
+
 const int rev_L = 1001;
 const int rev_R = 1002;
 const int turn_L = 1003;
 const int turn_R = 1004;
 const int forward = 1005;
 const int search = 1006;
+
 int currentState = search;
 
 
@@ -44,6 +45,8 @@ unsigned int sensor_values[NUM_SENSORS];
 
 const int IR_SENS_PIN = A0;
 const int IRLimit = 200;
+
+
 
 // the treshold for the floor sensors
 // this might need to be tuned for different lighting conditions, surfaces, etc.
@@ -57,8 +60,6 @@ const int FORWARD_SPEED = 200;
 const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
 const int TEST_DURATION = 10000; // ms
-
-
 
 //========================================================================
 // functions
@@ -104,19 +105,15 @@ void setup()
   flip.flipLeftMotor(true);
   flip.flipRightMotor(false);
   pinMode(LED, HIGH);
-
   waitForButtonAndCountDown();
- 
 }
 
-
-
 void loop()
-  {
-   
+  {  
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
   /*
+
   if(test_timer.timerHasExpired())
     {
     mov.wait();  
@@ -127,6 +124,7 @@ void loop()
     mov.wait();
     button.waitForRelease();
     waitForButtonAndCountDown();
+    test_timer.getTimer(TEST_DURATION);
     }
 
   // Checking what values sensors are detecting, printing them to Serialmonitor,
@@ -136,18 +134,19 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
+
   int ir = IR_R.readIR(IR_SENS_PIN, IRLimit); // Infra red sensor reading
 
 //================================================================================
 // movement controll
   if(sensor_values[5] > QTR_THRESHOLD) 
     {
-    rev_timer.getTimer(REVERSE_DURATION);  
+    rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(rev_R);
     }
   else if(sensor_values[0] > QTR_THRESHOLD)
     {
-    rev_timer.getTimer(REVERSE_DURATION);  
+    rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(rev_L); 
     }
   
@@ -157,7 +156,14 @@ void loop()
     }  
   else if (currentState > 1004 and !ir)
     {
-    changeStateTo(search);  
+    if(IR_R.readIR(IR_SENS_PIN, IRLimit))
+      {
+      changeStateTo(forward);
+      }
+    else
+      {
+      changeStateTo(search);
+      }
     }
 //================================================================================
 // motor controll
@@ -166,7 +172,7 @@ void loop()
     {
     case forward:
       mov.forward();
-    break;
+      break;
 
     case rev_L:
       mov.rev();
@@ -175,7 +181,7 @@ void loop()
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(turn_R); 
         }
-    break;
+      break;
 
     case rev_R:
       mov.rev();
@@ -184,7 +190,7 @@ void loop()
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(turn_L);  
         }
-    break;
+      break;
 
     case turn_R:
       mov.turn_R();
@@ -193,7 +199,7 @@ void loop()
         changeStateTo(search);
           
         }
-    break;
+      break;
 
     case turn_L:
       mov.turn_L();
@@ -202,9 +208,13 @@ void loop()
         changeStateTo(search);  
         
         }
+
         break;
 
      case search:
      mov.wait();
      break;
-    }}
+    }
+    
+    
+}
