@@ -34,6 +34,8 @@ const int turn_L = 1003;
 const int turn_R = 1004;
 const int forward = 1005;
 const int search = 1006;
+
+bool holdState = true; // et forøsk på å holda ryggingå
  int currentState = search;
 
 //int revState = placeholder;
@@ -112,7 +114,7 @@ bool readIR(int pin, int limit)
 void setup()
 {
   Serial.begin(9600);
-  flip.flipLeftMotor(false);
+  flip.flipLeftMotor(true);
   flip.flipRightMotor(false);
   pinMode(LED, HIGH);
 
@@ -155,24 +157,28 @@ void loop()
     {
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_R);
+    holdState = false;
     }
   else if(sensor_values[0] > QTR_THRESHOLD)
     {
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_L); 
+    holdState = false;
     }
   else
   {
+  while (holdState == true)
+  {
+  
   if(readIR(IR_SENS_PIN, IRLimit))
     {
     changeStateTo(forward);
     }  
-  
   else
     {
     changeStateTo(search);  
-    }}
-
+    }}}
+  
   switch(currentState)
     {
     case forward:
@@ -201,7 +207,8 @@ void loop()
       mov.turn_R();
       if(turn_timer.timerHasExpired())
         {
-        changeStateTo(search);  
+        changeStateTo(search);
+        holdState = true;  
         }
     break;
 
@@ -210,19 +217,20 @@ void loop()
       if(turn_timer.timerHasExpired())
         {
         changeStateTo(search);  
+        holdState = true;
         }
         break;
 
      case search:
      mov.wait();
      break;
-    }
-    Serial.println(currentState);
+    }}
+    
     
   
   
 //RECONSTRUCTION ABOVE ==========================================================
-/*  
+ /*
   if(sensor_values[0] > QTR_THRESHOLD)
     {
     rev_timer.getTimer(REVERSE_DURATION);  
@@ -233,9 +241,9 @@ void loop()
     rev_timer.getTimer(REVERSE_DURATION);  
     changeStateTo(rev_R); 
     }
-  if(revState == rev_L or revState == rev_R or revState == turn_L or revState == turn_R)
+  if(currentState == (rev_L or rev_R or turn_L or turn_R))
     {
-    switch(revState)
+    switch(currentState)
       {
       case rev_L:                                           //if the ground sensor detected something, start reversing
         mov.rev();
@@ -284,6 +292,6 @@ void loop()
       mov.search();
       } 
     }
-*/
+sensorValues();
 }
-  
+ */
