@@ -1,4 +1,6 @@
+#include "Timer.h"
 
+//=====================================================================
 #define NOTE_B0  31
 #define NOTE_C1  33
 #define NOTE_CS1 35
@@ -128,12 +130,55 @@ int notes = sizeof(melody) / sizeof(melody[0]) / 2;
 int wholenote = (60000 * 4) / tempo;
 
 int divider = 0, noteDuration = 0;
+//=======================================================================
 
-void setup() {
+
+const int LEDPIN = 13;
+const int BTNPIN = 12;
+const int BUZPIN = 3;
+const int duration = 50;
+const int ledOn = 2000;
+const int ledOff = 2001;
+const int songOn = 3000;
+const int songOff = 3001;
+int songState = songOff;
+int ledState = ledOn;
+int btnCount = 0;
+
+Timer ledTime;
+Timer songTime;
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(LEDPIN, OUTPUT);
+  pinMode(BUZPIN, OUTPUT);
+  pinMode(BTNPIN, INPUT);  
+}
+
+void loop()
+{
+    bool btnStat = digitalRead(BTNPIN);
+
+  if(btnStat)
+    {
+    btnCount = (btnCount + 1)%2; 
+    delay(100);
+    }
+  
+  Serial.println(btnCount);
+  if(btnCount == 1)
+    {
   // iterate over the notes of the melody.
   // Remember, the array is twice the number of notes (notes + durations)
   for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-
+      btnStat = digitalRead(BTNPIN);
+      if(btnStat)
+        {
+        btnCount = (btnCount + 1)%2; 
+        delay(100);
+        break;
+        }
     // calculates the duration of each note
     divider = melody[thisNote + 1];
     if (divider > 0) {
@@ -149,13 +194,45 @@ void setup() {
     tone(buzzer, melody[thisNote], noteDuration * 0.9);
 
     // Wait for the specief duration before playing the next note.
+    songTime.getTimer(noteDuration);
+    //while(!songTime.timerHasExpired())
+      {}
+    
     delay(noteDuration);
 
     // stop the waveform generation before the next note.
     noTone(buzzer);
-  }
-}
 
-void loop() {
-  // no need to repeat the melody.
+    switch(ledState)
+    {
+    case ledOn:
+       digitalWrite(LEDPIN, HIGH);
+       
+       if(ledTime.timerHasExpired())
+        {
+        ledTime.getTimer(duration);
+        ledState = ledOff;  
+        }
+     break;
+
+     case ledOff:
+        digitalWrite(LEDPIN, LOW);
+        
+        if(ledTime.timerHasExpired())
+        {
+        ledTime.getTimer(duration);
+        ledState = ledOn;  
+        }
+      break;
+    }
+  }
+    }
+  
+  
+  
+
+
+
+
+    
 }
