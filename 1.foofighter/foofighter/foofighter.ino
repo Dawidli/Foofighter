@@ -95,6 +95,7 @@ bool readIR(int pin, int limit)
 {
   bool IR;
   int val = analogRead(pin);
+  Serial.println(val);
   if (val >= limit)
   {
     IR = true;
@@ -123,9 +124,7 @@ void setup()
 
 void loop()
   {
-    mov.forward();
-    Serial.println("hei gulle");
-
+   
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
   
@@ -150,7 +149,7 @@ void loop()
 
 //================================================================================
 //Actual actions after initializing
-  /*
+  
   
   if(sensor_values[5] > QTR_THRESHOLD) 
     {
@@ -221,7 +220,7 @@ void loop()
     Serial.println(currentState);
     
   
-  */
+  
 //RECONSTRUCTION ABOVE ==========================================================
 /*  
   if(sensor_values[0] > QTR_THRESHOLD)
