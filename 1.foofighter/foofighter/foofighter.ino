@@ -46,7 +46,7 @@ const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
 const int IR_Left = 6;
-const int IR_Right = 11;
+const int IR_Right = A2;
 const int IR_L_SENS_PIN = A0;
 const int IR_R_SENS_PIN = A1;
 const int IRLimit = 300;
@@ -122,15 +122,15 @@ void setup()
 
 void loop()
   {
-   
+
   // Initialize speeds, and puts them inside of Movement class
-  mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
+  //mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
   /*
   if(test_timer.timerHasExpired())
     {
     mov.wait();  
     }*/
-  if (button.isPressed())
+ /* if (button.isPressed())
     {
     // if button is pressed, stop and wait for another press to go again
     mov.wait();
@@ -142,7 +142,7 @@ void loop()
   // so that we can adjust QTR_THRESHHOLD for the enviorment 
   sensors.read(sensor_values); 
   // sensorValues();
-
+*/
 //================================================================================
 //Actual actions after initializing
 
@@ -153,9 +153,9 @@ void loop()
 
   float penis = analogRead(IR_L_SENS_PIN);
   float rav = analogRead(IR_R_SENS_PIN);
-  Serial.print("venstre sens value e");
-  Serial.println(penis);
-  Serial.print("høyre sens value e");
+  Serial.print("venstre sens value e ");
+  Serial.println(rav);
+  Serial.print("høyre sens value e ");
   Serial.println(rav);
   delay(500);
   
@@ -191,7 +191,7 @@ void loop()
     }
 //================================================================================
 // motor controll
- 
+ /*
   switch(currentState)
     {
     case forward:
@@ -245,4 +245,4 @@ void loop()
      case search:
      mov.wait();
      break;
-    }}
+    }*/}
