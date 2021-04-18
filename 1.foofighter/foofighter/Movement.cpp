@@ -6,11 +6,11 @@ ZumoMotors motors;
 
 Movement::Movement()
   {
-    int FORWARD_SPEED = 0;
-    int REVERSE_SPEED = 0;
-    int TURN_SPEED = 0;
-    int REVERSE_DURATION = 0;
-    int TURN_DURATION = 0;
+     FORWARD_SPEED = 0;
+     REVERSE_SPEED = 0;
+     TURN_SPEED = 0;
+     REVERSE_DURATION = 0;
+     TURN_DURATION = 0;
   }
 
 void Movement::initSpeed(int forward, int reverse, int turn, int reverse_dur, int turn_dur)
