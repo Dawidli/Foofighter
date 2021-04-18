@@ -6,6 +6,8 @@ class Movement
   {
   public:
     void forward();
+    void forward_L();
+    void forward_R();
     void rev();
     void turn_L();
     void turn_R();

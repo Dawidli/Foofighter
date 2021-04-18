@@ -13,6 +13,7 @@
 //-------------------------
 Movement mov;
 Sens IR_R;
+Sens IR_L;
 Timer rev_timer;
 Timer turn_timer;
 Timer test_timer;
@@ -35,7 +36,9 @@ const int rev_R = 1002;
 const int turn_L = 1003;
 const int turn_R = 1004;
 const int forward = 1005;
-const int search = 1006;
+const int forward_L = 1006;
+const int forward_R = 1007;
+const int search = 1008;
 int currentState = search;
 
 
@@ -44,8 +47,9 @@ unsigned int sensor_values[NUM_SENSORS];
 
 const int IR_Left = 6;
 const int IR_Right = 11;
-const int IR_SENS_PIN = A0;
-const int IRLimit = 180;
+const int IR_L_SENS_PIN = A0;
+const int IR_R_SENS_PIN = A1;
+const int IRLimit = 300;
 
 // the treshold for the floor sensors
 // this might need to be tuned for different lighting conditions, surfaces, etc.
@@ -142,12 +146,18 @@ void loop()
 //================================================================================
 //Actual actions after initializing
 
-  int ir = IR_R.readIR(IR_SENS_PIN, IRLimit); // Infra red sensor reading
+  int ir_R = IR_R.readIR(IR_R_SENS_PIN, IRLimit); // Infra red sensor reading
+  int ir_L = IR_L.readIR(IR_L_SENS_PIN, IRLimit);
   digitalWrite(IR_Left, HIGH);
   digitalWrite(IR_Right, HIGH);
 
-  float penis = analogRead(IR_Left);
-  Serial.println(ir);
+  float penis = analogRead(IR_L_SENS_PIN);
+  float rav = analogRead(IR_R_SENS_PIN);
+  Serial.print("venstre sens value e");
+  Serial.println(penis);
+  Serial.print("høyre sens value e");
+  Serial.println(rav);
+  delay(500);
   
 //Serial.println(ir);
 //================================================================================
@@ -163,21 +173,37 @@ void loop()
     changeStateTo(rev_L); 
     }
   
-  else if (currentState > 1002 and ir)
+  else if (currentState > 1002 and ir_L and ir_R)
   {
     changeStateTo(forward);
+    } 
+     else if (currentState > 1002 and ir_L and !ir_R)
+  {
+    changeStateTo(forward_L);
     }  
-  else if (currentState > 1004 and !ir)
+     else if (currentState > 1002 and !ir_L and ir_R)
+  {
+    changeStateTo(forward_R);
+    }   
+  else if (currentState > 1004 and !ir_L and !ir_R)
     {
     changeStateTo(search);  
     }
 //================================================================================
 // motor controll
-   
+ 
   switch(currentState)
     {
     case forward:
       mov.forward();
+    break;
+
+    case forward_L:
+    mov.forward_L();
+    break;
+
+    case forward_R:
+    mov.forward_R();
     break;
 
     case rev_L:

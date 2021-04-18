@@ -33,6 +33,18 @@ void Movement::forward()
     // set both motors to forward
     motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
   }
+  
+  void Movement::forward_L()
+  {
+    // set both motors to forward
+    motors.setSpeeds(FORWARD_SPEED/4, FORWARD_SPEED);
+  }
+  
+  void Movement::forward_R()
+  {
+    // set both motors to forward
+    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED/2);
+  }
 
 void Movement::wait()
   {
