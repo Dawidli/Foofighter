@@ -51,26 +51,27 @@ unsigned int sensor_values[NUM_SENSORS];
 //=======================================================================
 // constant variables to the IR-sensors
 
-//const int IR_Left = 6;
-//const int IR_Right = A2;
 const int IR_L_SENS_PIN = A0;
 const int IR_R_SENS_PIN = A1;
-const int IRLimit = 300;
+const int IRLimit = 180;
 
 //=======================================================================
 // the treshold for the floor sensors
 
 const int QTR_THRESHOLD = 1500; // microseconds
-
+//=======================================================================
 //motor speed
+
 const int REVERSE_SPEED = 200; // 0 is stopped, 400 is full speed
 const int TURN_SPEED = 200;
 const int FORWARD_SPEED = 200;
+
+//========================================================================
+// diffrents time durations
+
 const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
 const int TEST_DURATION = 10000; // ms
-
-
 
 
 //========================================================================
@@ -154,8 +155,7 @@ sensors.read(sensor_values);
 
 int ir_R = IR_R.readIR(IR_R_SENS_PIN, IRLimit);
 int ir_L = IR_L.readIR(IR_L_SENS_PIN, IRLimit);
-//digitalWrite(IR_Left, HIGH);
-//digitalWrite(IR_Right, HIGH);
+
 
 float A_0 = analogRead(IR_L_SENS_PIN);
 float A_1 = analogRead(IR_R_SENS_PIN);
@@ -163,7 +163,7 @@ Serial.print("A0 sens value e ");
 Serial.println(A_0);
 Serial.print("A1 sens value e ");
 Serial.println(A_1);
-//delay(500);
+delay(500);
 
 //================================================================================
 // movement controll
@@ -173,37 +173,44 @@ if(sensor_values[5] > QTR_THRESHOLD)
   {
   rev_timer.getTimer(REVERSE_DURATION);  
   changeStateTo(rev_L);
+  //Serial.println("bakke detektor");
   }
   //if the left-most ground sensor detects anything, it will reverse. This action can't be canceled
 else if(sensor_values[0] > QTR_THRESHOLD)
   {
   rev_timer.getTimer(REVERSE_DURATION);  
-  changeStateTo(rev_R); 
+  changeStateTo(rev_R);
+  //Serial.println("bakke detektor"); 
   }
   // if both ir-sensors detect and it is not reversing it will move straight
 else if (currentState > 1002 and ir_L and ir_R)
   {
     changeStateTo(forward);
+    //Serial.println("kjøre rett fram");
   } 
   // if left ir-sensor detect and it is not reversing it will move straight and to the left
 else if (currentState > 1002 and ir_L and !ir_R)
   {
     changeStateTo(forward_L);
+    //Serial.println("kjøre rett fram og te venstre");
   }  
   // if right ir-sensor detect and it is not reversing it will move straight and to the right
 else if (currentState > 1002 and !ir_L and ir_R)
   {
     changeStateTo(forward_R);
+    //Serial.println("kjøre rett fram og te høyre");
   }   
   // if none of the sensor detect anything it will go into search mode to fina the opponent
 else if (currentState > 1004 and !ir_L and !ir_R)
   {
-    changeStateTo(search);  
+    changeStateTo(search); 
+    //Serial.print("why am i still here?...... "); 
+    //Serial.println("just to suffer?");
   }
   
 //================================================================================
 // motor controll
-
+Serial.println(currentState);
 switch(currentState)
   {
   // the motor command to go forward
