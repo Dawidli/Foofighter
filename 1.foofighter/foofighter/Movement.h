@@ -16,11 +16,11 @@ class Movement
     void initSpeed(int forward, int reverse, int turn, int reverse_dur, int turn_dur);
     Movement();
   private:
-    int FORWARD_SPEED = 0;
-    int REVERSE_SPEED = 0;
-    int TURN_SPEED = 0;
-    int REVERSE_DURATION = 0;
-    int TURN_DURATION = 0;
+    int FORWARD_SPEED;
+    int REVERSE_SPEED;
+    int TURN_SPEED;
+    int REVERSE_DURATION;
+    int TURN_DURATION;
   };
 
 #endif
