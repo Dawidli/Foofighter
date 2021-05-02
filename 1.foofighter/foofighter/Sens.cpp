@@ -9,7 +9,6 @@ bool Sens::readIR(int pin, int limit)
 {
   bool IR;
   val = analogRead(pin);
-  //Serial.println(val);
   
   if (val >= limit)
   {

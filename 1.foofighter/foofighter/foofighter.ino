@@ -62,8 +62,8 @@ const int QTR_THRESHOLD = 1500; // microseconds 1500 for normal bakke
 //=======================================================================
 //motor speed
 
-const int REVERSE_SPEED = 400; // 0 is topped, 400 is full speed
-const int TURN_SPEED = 400;
+const int REVERSE_SPEED = 300; // 0 is topped, 400 is full speed
+const int TURN_SPEED = 300;
 const int FORWARD_SPEED = 400;
 
 //========================================================================
@@ -99,7 +99,7 @@ void changeStateTo (int newState)
 {
   currentState = newState;
 }
-
+// a function to test the ground sensors
 void sensorValues()
 {
   Serial.print("Sensor 0 detects: ");
@@ -155,7 +155,7 @@ void loop()
 
   int ir_R = IR_R.readIR(IR_R_SENS_PIN, IRLimit);
   int ir_L = IR_L.readIR(IR_L_SENS_PIN, IRLimit);
-
+// a function to test the IR sensors
   /*
     float A_0 = analogRead(IR_L_SENS_PIN);
     float A_1 = analogRead(IR_R_SENS_PIN);
@@ -204,8 +204,6 @@ void loop()
   else if (currentState > 1004 and !ir_L and !ir_R)
   {
     changeStateTo(search);
-    //Serial.print("why am i still here?...... ");
-    //Serial.println("just to suffer?");
   }
 
   //================================================================================
@@ -268,7 +266,7 @@ void loop()
 
     // the motor command to search fot the opponent
     case search:
-      mov.search(); //me trenge å laga ein søke kommando
+      mov.search(); 
       break;
   }
 }
