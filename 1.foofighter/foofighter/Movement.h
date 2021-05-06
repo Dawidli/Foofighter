@@ -1,6 +1,6 @@
-
-//=======================================================================
 // The class for the movement functions
+//=======================================================================
+
 #ifndef Movement_h
 #define Movement_h
 #include "Arduino.h"
