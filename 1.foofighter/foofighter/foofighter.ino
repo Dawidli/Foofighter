@@ -42,7 +42,7 @@ const int FORWARD_R = 1007;
 const int SEARCH = 1008;
 int currentState = SEARCH;
 
-//Combined reverse and turn function
+//Combined reverse and turn command
 //=======================================================================
 
 const int REVERSE = 1002;
