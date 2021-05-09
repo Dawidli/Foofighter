@@ -1,9 +1,8 @@
-// Public Library
+// Public Library import
 //=======================================================================
-
 #include <ZumoShield.h>
 
-//Local Library
+//Local Library import
 //=======================================================================
 #include "Movement.h"
 #include "Timer.h"
@@ -11,7 +10,6 @@
 
 //Named Local Library
 //=======================================================================
-
 Movement mov;
 Sens IR_R;
 Sens IR_L;
@@ -25,13 +23,11 @@ ZumoBuzzer buzzer;
 ZumoMotors flip;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
-
-//Constants and Variables for the Case-system
 //=======================================================================
 
 const int LED = 13;
 
-// Contstans to the Case-system
+// Constants to the Case-system
 const int REV_L = 1001;
 const int REV_R = 1002;
 const int TURN_L = 1003;
@@ -42,7 +38,7 @@ const int FORWARD_R = 1007;
 const int SEARCH = 1008;
 int currentState = SEARCH;
 
-//Combined reverse and turn command
+//Combined reverse and turn commands
 //=======================================================================
 
 const int REVERSE = 1002;
@@ -66,16 +62,16 @@ const int IRLIMIT = 180;
 // the treshold for the floor sensors
 //=======================================================================
 
-const int QTR_THRESHOLD = 1500; // microseconds 1500 for normal bakke
+const int QTR_THRESHOLD = 1500; // microseconds 1500
 
 //motor speed
 //=======================================================================
 
-const int REVERSE_SPEED = 300; // 0 is topped, 400 is full speed
+const int REVERSE_SPEED = 300; // 0 is not moving, 400 is full speed
 const int TURN_SPEED = 300;
 const int FORWARD_SPEED = 400;
 
-// diffrents time durations
+// different time durations
 //========================================================================
 
 const int REVERSE_DURATION = 1000; // ms
@@ -85,13 +81,15 @@ const int TEST_DURATION = 10000; // ms
 // functions
 //========================================================================
 
+// Function that is used to start the robot and play a countdown for 5 seconds
+// this wait period is required for the competition
 void waitForButtonAndCountDown()
 {
   digitalWrite(LED, HIGH);
   button.waitForButton();
   digitalWrite(LED, LOW);
 
-  // play audible countdown
+  // play audible countdown, this sequence last for 5 seconds
   for (int i = 0; i < 3; i++)
   {
     delay(1000);
@@ -103,10 +101,13 @@ void waitForButtonAndCountDown()
   //test_timer.getTimer(TEST_DURATION);
 }
 
+// A function to change the global variable currentState, which is used to
+// to determine what action robot is about to do
 void changeStateTo (int newState)
 {
   currentState = newState;
 }
+
 // a function to test the ground sensors
 void sensorValues()
 {
@@ -121,11 +122,14 @@ void sensorValues()
 
 void setup()
 {
-  Serial.begin(9600);
+  // Replace true and false if the motors are spinning in the wrong direction
   flip.flipLeftMotor(true);
   flip.flipRightMotor(false);
+
+  // Turn on led
   pinMode(LED, HIGH);
 
+  // Wait for buttonpress to start a countdown and end setup sequence after countdown
   waitForButtonAndCountDown();
 
 }
@@ -135,14 +139,8 @@ void loop()
 
   // Initialize speeds, and puts them inside of Movement class
   mov.initSpeed(FORWARD_SPEED, REVERSE_SPEED, TURN_SPEED, REVERSE_DURATION, TURN_DURATION);
-  /*
-   * if wanted to test te program for a extended usage
-    if(test_timer.timerHasExpired())
-    {
-    mov.wait();
-    }
-  */
-  // the command for the staring frequenze
+
+  // the command for the starting sequence
   if (button.isPressed())
   {
     // if button is pressed, stop and wait for another press to go again
@@ -150,28 +148,14 @@ void loop()
     button.waitForRelease();
     waitForButtonAndCountDown();
   }
-
-  // Checking what values sensors are detecting, printing them to Serialmonitor,
-  // so that we can adjust QTR_THRESHHOLD for the enviorment
-  //sensors.read(sensor_values);
-  // sensorValues();
+  
   //Actual actions after initializing
   //================================================================================
   //IR sens readings
 
   int ir_R = IR_R.readIR(IR_R_SENS_PIN, IRLIMIT);
   int ir_L = IR_L.readIR(IR_L_SENS_PIN, IRLIMIT);
-// a function to test the IR sensors
-  /*
-   * test function for the IR-sensor
-    float A_0 = analogRead(IR_L_SENS_PIN);
-    float A_1 = analogRead(IR_R_SENS_PIN);
-    Serial.print("A0 sens value e ");
-    Serial.println(A_0);
-    Serial.print("A1 sens value e ");
-    Serial.println(A_1);
-    delay(500);
-  */
+
   // movement controll
   //================================================================================
  
@@ -180,7 +164,6 @@ void loop()
   {
     rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(REV_L);
-    //Serial.println("bakke detektor");
   }
   //if the left-most ground sensor detects anything, it will reverse. This action can't be canceled
   else if (GroundSens_H < QTR_THRESHOLD)
@@ -188,7 +171,7 @@ void loop()
     rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(REV_R);
   }
-  // if both ir-sensors detect and it is not reversing it will move straight+
+  // if both ir-sensors detect and it is not reversing it will move straight
   else if (currentState > REVERSE and ir_L and ir_R)
   {
     changeStateTo(FORWARD);
@@ -203,7 +186,7 @@ void loop()
   {
     changeStateTo(FORWARD_R);
   }
-  // if none of the sensor detect anything it will go into search mode to fina the opponent
+  // if none of the sensor detect anything it will go into search mode to find the opponent
   else if (currentState > TURN and !ir_L and !ir_R)
   {
     changeStateTo(SEARCH);
@@ -216,17 +199,17 @@ void loop()
     // the motor command to go forward
     case FORWARD:
       mov.forward();
-      break;
+    break;
 
     // the motor command to go forward and to the left
     case FORWARD_L:
       mov.forward_L();
-      break;
+    break;
 
     // the motor command to go forward and to the right
     case FORWARD_R:
       mov.forward_R();
-      break;
+    break;
 
     // the motor commnad to reverse. This cannot be canceled
     case REV_L:
@@ -236,7 +219,7 @@ void loop()
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(TURN_L);
       }
-      break;
+    break;
 
     // the motor commnad to reverse. This cannot be canceled
     case REV_R:
@@ -246,29 +229,29 @@ void loop()
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(TURN_R);
       }
-      break;
+    break;
 
-    // the motor command to swing to the right. This commando can be canceld if the IR-sens detect anything
+    // the motor command to turn to the right. This commando can be canceled if the IR-sens detects anything
     case TURN_R:
       mov.turn_R();
       if (turn_timer.timerHasExpired())
       {
         changeStateTo(SEARCH);
       }
-      break;
+    break;
 
-    // the motor command to swing to the left. This commando can be canceld if the IR-sens detect anything
+    // the motor command to turn to the left. This commando can be canceled if the IR-sens detects anything
     case TURN_L:
       mov.turn_L();
       if (turn_timer.timerHasExpired())
       {
         changeStateTo(SEARCH);
       }
-      break;
+    break;
 
-    // the motor command to search fot the opponent
+    // the motor command to search for the opponent
     case SEARCH:
       mov.search(); 
-      break;
+    break;
   }
 }
