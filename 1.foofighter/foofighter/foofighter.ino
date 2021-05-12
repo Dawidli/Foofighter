@@ -49,8 +49,8 @@ const int TURN = 1004;
 
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
-int GroundSens_L = sensor_values[5];
-int GroundSens_H = sensor_values[0];
+int groundSens_L = sensor_values[5];
+int groundSens_H = sensor_values[0];
 
 // constant variables to the IR-sensors
 //=======================================================================
@@ -108,16 +108,6 @@ void changeStateTo (int newState)
   currentState = newState;
 }
 
-// a function to test the ground sensors
-void sensorValues()
-{
-  Serial.print("Sensor 0 detects: ");
-  Serial.println(GroundSens_H);
-  Serial.print("Sensor 5 detects: ");
-  Serial.println(GroundSens_L);
-  Serial.println("");
-}
-
 //========================================================================
 
 void setup()
@@ -160,13 +150,13 @@ void loop()
   //================================================================================
  
   //if the right-most ground sensor detects anything, it will reverse. This action can't be canceled
-  if (GroundSens_L < QTR_THRESHOLD)
+  if (groundSens_L < QTR_THRESHOLD)
   {
     rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(REV_L);
   }
   //if the left-most ground sensor detects anything, it will reverse. This action can't be canceled
-  else if (GroundSens_H < QTR_THRESHOLD)
+  else if (groundSens_H < QTR_THRESHOLD)
   {
     rev_timer.getTimer(REVERSE_DURATION);
     changeStateTo(REV_R);
