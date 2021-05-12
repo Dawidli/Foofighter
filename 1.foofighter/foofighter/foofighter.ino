@@ -23,26 +23,6 @@ ZumoBuzzer buzzer;
 ZumoMotors flip;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
-//=======================================================================
-
-const int LED = 13;
-
-// Constants to the Case-system
-const int REV_L = 1001;
-const int REV_R = 1002;
-const int TURN_L = 1003;
-const int TURN_R = 1004;
-const int FORWARD = 1005;
-const int FORWARD_L = 1006;
-const int FORWARD_R = 1007;
-const int SEARCH = 1008;
-int currentState = SEARCH;
-
-//Combined reverse and turn commands
-//=======================================================================
-
-const int REVERSE = 1002;
-const int TURN = 1004;
 
 // array AND defenition for the ground sensor
 //=======================================================================
@@ -50,19 +30,48 @@ const int TURN = 1004;
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 int groundSens_L = sensor_values[5];
-int groundSens_H = sensor_values[0];
-
-// constant variables to the IR-sensors
-//=======================================================================
-
-const int IR_L_SENS_PIN = A0;
-const int IR_R_SENS_PIN = A1;
-const int IRLIMIT = 180;
+int groundSens_R = sensor_values[0];
 
 // the treshold for the floor sensors
 //=======================================================================
 
 const int QTR_THRESHOLD = 1500; // microseconds 1500
+
+//Variables for the program
+//=======================================================================
+
+const int LED = 13; //for the ligthning
+
+// Constants to the Case-system
+//=======================================================================
+const int REVERSE_L = 1001; 
+const int REVERSE_R = 1002; 
+const int TURN_L = 1003;
+const int TURN_R = 1004;
+const int OPPONENT_F = 1005; //F stands for forward
+const int OPPONENT_L = 1006; //L stands for left
+const int OPPONENT_R = 1007; //R stands for right
+const int SEARCH = 1008;
+int currentState = SEARCH;
+
+//Constant variables to the Infrared sensors atop of the robot
+//=======================================================================
+
+const int IR_L_SENS_PIN = A0;
+const int IR_R_SENS_PIN = A1;
+const int IRLIMIT = 180; //Distance value
+int ir_R = 0;
+int ir_L = 0;
+
+//Detection states for the sensor system
+//=======================================================================
+bool groundSens_R_active = (groundSens_R < QTR_THRESHOLD);
+bool groundSens_L_active = (groundSens_L < QTR_THRESHOLD);
+bool IR_R_active = !ir_L and ir_R;
+bool IR_L_active = ir_L and !ir_R;
+bool both_ir_active = ir_L and ir_R;
+bool both_ir_unactive = !ir_L and !ir_R;
+bool not_reversing = !(REVERSE_L or REVERSE_R);
 
 //motor speed
 //=======================================================================
@@ -76,7 +85,6 @@ const int FORWARD_SPEED = 400;
 
 const int REVERSE_DURATION = 1000; // ms
 const int TURN_DURATION = 2000; // ms
-const int TEST_DURATION = 10000; // ms
 
 // functions
 //========================================================================
@@ -140,86 +148,91 @@ void loop()
   }
   
   //Actual actions after initializing
-  //================================================================================
-  //IR sens readings
 
-  int ir_R = IR_R.readIR(IR_R_SENS_PIN, IRLIMIT);
-  int ir_L = IR_L.readIR(IR_L_SENS_PIN, IRLIMIT);
+  //IR sens readings
+  //================================================================================
+  
+
+  ir_R = IR_R.readIR(IR_R_SENS_PIN, IRLIMIT);
+  ir_L = IR_L.readIR(IR_L_SENS_PIN, IRLIMIT);
 
   // movement controll
   //================================================================================
- 
+
   //if the right-most ground sensor detects anything, it will reverse. This action can't be canceled
-  if (groundSens_L < QTR_THRESHOLD)
+  if (groundSens_L_active)
   {
     rev_timer.getTimer(REVERSE_DURATION);
-    changeStateTo(REV_L);
+    changeStateTo(REVERSE_L);
   }
   //if the left-most ground sensor detects anything, it will reverse. This action can't be canceled
-  else if (groundSens_H < QTR_THRESHOLD)
+  else if (groundSens_R_active)
   {
     rev_timer.getTimer(REVERSE_DURATION);
-    changeStateTo(REV_R);
+    changeStateTo(REVERSE_R);
   }
-  // if both ir-sensors detect and it is not reversing it will move straight
-  else if (currentState > REVERSE and ir_L and ir_R)
+  //if the robot is not reversing, it will start looking after the opponent
+  else if(not_reversing)
   {
-    changeStateTo(FORWARD);
+  // if both ir-sensors detect and it is not reversing it will move straight
+  if (both_ir_active)
+  {
+    changeStateTo(OPPONENT_F);
   }
   // if left ir-sensor detect and it is not reversing it will move straight and to the left
-  else if (currentState > REVERSE and ir_L and !ir_R)
+  else if (IR_L_active)
   {
-    changeStateTo(FORWARD_L);
+    changeStateTo(OPPONENT_L);
   }
   // if right ir-sensor detect and it is not reversing it will move straight and to the right
-  else if (currentState > REVERSE and !ir_L and ir_R)
+  else if (IR_R_active)
   {
-    changeStateTo(FORWARD_R);
+    changeStateTo(OPPONENT_R);
   }
   // if none of the sensor detect anything it will go into search mode to find the opponent
-  else if (currentState > TURN and !ir_L and !ir_R)
+  else if (both_ir_unactive)
   {
     changeStateTo(SEARCH);
-  }
+  }}
   
   // motor controll
   //================================================================================
   switch (currentState)
   {
     // the motor command to go forward
-    case FORWARD:
+    case OPPONENT_F:
       mov.forward();
-    break;
+      break;
 
     // the motor command to go forward and to the left
-    case FORWARD_L:
+    case OPPONENT_L:
       mov.forward_L();
-    break;
+      break;
 
     // the motor command to go forward and to the right
-    case FORWARD_R:
+    case OPPONENT_R:
       mov.forward_R();
     break;
 
     // the motor commnad to reverse. This cannot be canceled
-    case REV_L:
+    case REVERSE_L:
       mov.rev();
       if (rev_timer.timerHasExpired())
       {
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(TURN_L);
       }
-    break;
+      break;
 
     // the motor commnad to reverse. This cannot be canceled
-    case REV_R:
+    case REVERSE_R:
       mov.rev();
       if (rev_timer.timerHasExpired())
       {
         turn_timer.getTimer(TURN_DURATION);
         changeStateTo(TURN_R);
       }
-    break;
+      break;
 
     // the motor command to turn to the right. This commando can be canceled if the IR-sens detects anything
     case TURN_R:
@@ -228,7 +241,7 @@ void loop()
       {
         changeStateTo(SEARCH);
       }
-    break;
+      break;
 
     // the motor command to turn to the left. This commando can be canceled if the IR-sens detects anything
     case TURN_L:
@@ -237,11 +250,11 @@ void loop()
       {
         changeStateTo(SEARCH);
       }
-    break;
+      break;
 
     // the motor command to search for the opponent
     case SEARCH:
       mov.search(); 
-    break;
+      break;
   }
 }
