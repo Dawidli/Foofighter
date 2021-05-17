@@ -174,26 +174,27 @@ void loop()
   //if the robot is not reversing, it will start looking after the opponent
   else if(not_reversing)
   {
-  // if both ir-sensors detect and it is not reversing it will move straight
-  if (both_ir_active)
-  {
-    changeStateTo(OPPONENT_F);
-  }
-  // if left ir-sensor detect and it is not reversing it will move straight and to the left
-  else if (IR_L_active)
-  {
-    changeStateTo(OPPONENT_L);
-  }
-  // if right ir-sensor detect and it is not reversing it will move straight and to the right
-  else if (IR_R_active)
-  {
+     // if both ir-sensors detect and it is not reversing it will move straight
+    if (both_ir_active)
+    {
+      changeStateTo(OPPONENT_F);
+    }
+    // if left ir-sensor detect and it is not reversing it will move straight and to the left
+    else if (IR_L_active)
+    {
+      changeStateTo(OPPONENT_L);
+    }
+    // if right ir-sensor detect and it is not reversing it will move straight and to the right
+    else if (IR_R_active)
+    {
     changeStateTo(OPPONENT_R);
+    }
+    // if none of the sensor detect anything it will go into search mode to find the opponent
+    else if (both_ir_unactive)
+    {
+      changeStateTo(SEARCH);
+    }
   }
-  // if none of the sensor detect anything it will go into search mode to find the opponent
-  else if (both_ir_unactive)
-  {
-    changeStateTo(SEARCH);
-  }}
   
   // motor controll
   //================================================================================
